@@ -61,6 +61,7 @@ make distclean
 
 Apache (http://httpd.apache.org/dist/httpd/)
 --------------------------------------------
+LIBS=-lpthread \
 SSL_BASE=$PREFIX \
 EAPI_MM=/export/home/files/build/mm-1.1.3 \
 ./configure \
@@ -236,10 +237,11 @@ dependencies that PHP requires before it will build)
 --with-gd \
 --with-mysql=$PREFIX/mysql \
 --with-pgsql=$PREFIX/postgres \
+--with-oci8=/export/home/oracle-9.0.1/OraHome1 \
 --with-mm=/usr/local/lib \
---with-zlib=/usr/lib \
+--with-zlib=/lib \
 --with-xml \
---with-openssl=/usr/local/openssl \
+--with-openssl=$PREFIX \
 --with-gdbm \
 --with-gettext \
 --enable--sysvsem \
