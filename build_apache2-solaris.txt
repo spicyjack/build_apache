@@ -16,6 +16,7 @@ best remove them or they may get stomped.
 OpenSSL (http://www.openssl.org/source/)
 ----------------------------------------
 ./Configure <machine_type> --prefix=$PREFIX
+./config --prefix=$PREFIX
 make
 sudo make install
 

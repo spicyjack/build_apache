@@ -70,7 +70,8 @@ sudo make install
 
 MM (http://www.engelschall.com/sw/mm/#tarballs)
 -----------------------------------------------
-./configure --prefix=$PREFIX
+#./configure --prefix=$PREFIX
+./configure (problems with apache finding libmm in the apache runtime tree?)
 make
 sudo make install
 
@@ -95,7 +96,7 @@ make distclean
 Apache (http://httpd.apache.org/dist/httpd/)
 --------------------------------------------
 SSL_BASE=$PREFIX \
-EAPI_MM=../mm \
+EAPI_MM=/usr/local/src/apache/mm \
 ./configure \
 --prefix=$PREFIX \
 --enable-module=ssl \
