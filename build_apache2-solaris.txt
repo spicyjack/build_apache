@@ -132,7 +132,8 @@ PHP 4.3.2 (http://www.php.net/download)
 --with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=$PREFIX/conf \
 --with-mysql \
---with-zlib=/lib \ # need zlib header
+--with-pgsql \
+--with-zlib-dir=/lib \ # need zlib header
 --with-xml \
 --with-openssl=$PREFIX \
 --with-gdbm \ # need gdbm headers
