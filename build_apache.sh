@@ -1,3 +1,9 @@
+# I've never gotten this script to work.  There's other things out there like
+# it now anyways, like ApacheToolbox.  It lives at
+# http://www.apachetoolbox.com.  This script will no longer be worked on.
+
+# Brian Manning May 21, 2001
+
 #!/bin/sh -x
 
 # script to build apache

@@ -1,3 +1,13 @@
+***NOTE******NOTE******NOTE******NOTE******NOTE******NOTE******NOTE****
+
+This file is old.  Each time I end up building Apache, my needs hence these
+files change.  From now on, these will be named with the same names as the
+platform I'm compiling for.  Any file with this note is no longer being
+maintained, use at your own risk.
+
+***NOTE******NOTE******NOTE******NOTE******NOTE******NOTE******NOTE****
+
+
 THE MONSTER YOU DREAD!!!
 building apache with DSO support
 then building mod_perl + mod_ssl + mod_php + mod_dav and the kitchen sink

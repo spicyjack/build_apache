@@ -1,3 +1,12 @@
+***NOTE******NOTE******NOTE******NOTE******NOTE******NOTE******NOTE****
+
+This file is old.  Each time I end up building Apache, my needs hence these 
+files change.  From now on, these will be named with the same names as the 
+platform I'm compiling for.  Any file with this note is no longer being 
+maintained, use at your own risk.
+
+***NOTE******NOTE******NOTE******NOTE******NOTE******NOTE******NOTE****
+
 OpenSSL 0.9.6
 -------------
 ./config --prefix=/usr/local --openssldir=/usr/local
