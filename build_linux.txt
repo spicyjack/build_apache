@@ -217,29 +217,34 @@ normal and immediate modes.
 
 
 PHP (http://www.php.net/downloads.php)
-(See below for more details about this specific build as well as other software
-dependencies that PHP requires before it will build)
+See below for more details about this specific build as well as other software
+dependencies that PHP requires before it will build.  If you are building IMAP,
+you just have to 'make' the source, you don't have to install it, PHP pulls
+what it needs out of the source.
 --------
 ./configure \
---prefix=/export/home/apache \
---with-apxs=/export/home/apache/bin/apxs \
---with-config-file-path=/export/home/apache/conf \
+--prefix=/usr/local/apache \
+--with-apxs=/usr/local/apache/bin/apxs \
+--with-config-file-path=/usr/local/apache/conf \
 --with-gd \
---with-mysql=/export/home/mysql \
---with-pgsql=/export/home/postgres \
+--with-mysql=/usr \
+--with-pgsql=/usr/local/pgsql \
 --with-mm=/usr/local/lib \
---with-zlib=/usr/lib \
+--with-zlib \
+--with-zlib-dir=/usr/lib \
 --with-xml \
---with-openssl=/usr/local/openssl \
 --with-gdbm \
 --with-gettext \
+--with-imap=/usr/local/src/imap \
 --enable--sysvsem \
 --enable-sysvshm \
 --enable-force-cgi-redirect \
 --enable-calendar \
 --enable-inline-optimization \
+--enable-trans-sid \
 --enable-track-vars
 
+--with-openssl=/usr/local \
 make
 make install
 
@@ -257,7 +262,7 @@ I don't think you need to use '--with-apache[=DIR]' if you do
 '--with-apxs[=FILE]' instead.
 
 Left over config variables
-#--with-imap=/usr/local/src/apache/imap \
+
 #--with-ldap=/usr/lib \ 
 
 After I built PHP, if I do configtest in Apache, it complains about not seeing
