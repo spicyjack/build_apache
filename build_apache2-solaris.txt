@@ -108,3 +108,9 @@ For mod_ssl, chances are Apache won't link to the correct archived library
 (libssl.a), and you'll have to re-link the file to create a new shared library.
 (maybe go back in and rebuild the mod_ssl library with all of the lo files in
 the ssl directory)
+
+Adding the Apache runtime users:
+--------------------------------
+shell> groupadd -g 710 webuser
+shell> useradd -u 110 -g webuser -d /export/home/apache www
+
