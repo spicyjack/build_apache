@@ -58,7 +58,67 @@ this (see e-mail thread at the bottom of this file).
 make
 sudo make install
 
-IMAP 2002e (ftp://ftp.cac.washington.edu/imap/)
+Apache 2.0.xx
+-------------
+unpack the tarball, cd into the source directory.  To get a full listing of
+compile options you can set in Apache, use './configure --help'
+
+Before you compile the main httpd binary with LDAP support, you'll need to
+first compile the 'apr-util' with LDAP support as well:
+
+cd $APACHE_SRC/srclib/apr-util
+./configure --with-ldap --with-dbm=gdbm --with-apr=../apr
+make
+
+Then compile Apache:
+
+./configure \
+--prefix=$PREFIX \
+--with-ssl=$PREFIX \
+--enable-auth-dbm \
+--enable-auth-digest \
+--enable-dav \
+--enable-dav-fs \
+--enable-info \
+--enable-rewrite \
+--enable-proxy \
+--enable-ssl \
+--enable-usertrack \
+--enable-vhost-alias \
+--enable-static-htpasswd \
+--enable-static-ab \
+--enable-mods-shared=all \
+--with-mpm=prefork
+
+make
+sudo make install
+
+Change the User and Group in httpd.conf that the webserver will run as to the
+user/group you created at the top of this file.
+
+# --enable-example \ # for development only
+# --enable-so \ # enabled when --enable-shared-mods is used as well
+# --enable-ldap=/usr \ # having problems compiling ldap
+# --enable-auth-ldap \ # having problems compiling ldap
+
+For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
+modules don't get linked correctly against libgcc.a.  This is because the
+Apache coders use the GNU ld utility for linking modules, which doesn't come by
+default on the reference system.  You can either link the culprit files by
+hand, or install the GNU binutils and recompile.  See the below URL's for more
+info and solutions:
+
+http://perl.apache.org/docs/1.0/guide/troubleshooting.html#symbol___floatdisf__referenced_symbol_not_found
+http://www.riverside.org/archive/html/new-httpd/2003-01/msg00051.html
+
+For mod_ssl, chances are Apache won't link to the correct archived library
+(libssl.a), and you'll have to re-link the file to create a new shared library.
+(maybe go back in and rebuild the mod_ssl library with all of the lo files in
+the ssl directory)
+
+See also the OpenSSL thread at the bottom of this file.
+
+IMAP 2004 (ftp://ftp.cac.washington.edu/imap/)
 -----------------------------------------------
 Unpack the IMAP tarball, then edit "src/osdep/unix/Makefile".  At the top of
 that file, there are a bunch of SSL-related compile directives.  Change those
@@ -123,66 +183,6 @@ distribution are:
      shell> bin/mysqld_safe --user=mysql &
      if you are running MySQL 4.x
 
-
-Apache 2.0.xx
--------------
-unpack the tarball, cd into the source directory.  To get a full listing of
-compile options you can set in Apache, use './configure --help'
-
-Before you compile the main httpd binary with LDAP support, you'll need to
-first compile the 'apr-util' with LDAP support as well:
-
-cd $APACHE_SRC/srclib/apr-util
-./configure --with-ldap --with-dbm=gdbm --with-apr=../apr
-make
-
-Then compile Apache:
-
-./configure \
---prefix=$PREFIX \
---with-ssl=$PREFIX \
---enable-auth-dbm \
---enable-auth-digest \
---enable-dav \
---enable-dav-fs \
---enable-info \
---enable-rewrite \
---enable-proxy \
---enable-ssl \
---enable-usertrack \
---enable-vhost-alias \
---enable-static-htpasswd \
---enable-static-ab \
---enable-mods-shared=all \
---with-mpm=prefork
-
-make
-sudo make install
-
-Change the User and Group in httpd.conf that the webserver will run as to the
-user/group you created at the top of this file.
-
-# --enable-example \ # for development only
-# --enable-so \ # enabled when --enable-shared-mods is used as well
-# --enable-ldap=/usr \ # having problems compiling ldap
-# --enable-auth-ldap \ # having problems compiling ldap
-
-For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
-modules don't get linked correctly against libgcc.a.  This is because the
-Apache coders use the GNU ld utility for linking modules, which doesn't come by
-default on the reference system.  You can either link the culprit files by
-hand, or install the GNU binutils and recompile.  See the below URL's for more
-info and solutions:
-
-http://perl.apache.org/docs/1.0/guide/troubleshooting.html#symbol___floatdisf__referenced_symbol_not_found
-http://www.riverside.org/archive/html/new-httpd/2003-01/msg00051.html
-
-For mod_ssl, chances are Apache won't link to the correct archived library
-(libssl.a), and you'll have to re-link the file to create a new shared library.
-(maybe go back in and rebuild the mod_ssl library with all of the lo files in
-the ssl directory)
-
-See also the OpenSSL thread at the bottom of this file.
 
 PHP 4.3.x (http://www.php.net/download)
 ---------------------------------------
