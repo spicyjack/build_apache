@@ -503,6 +503,9 @@ $ sign.sh server.csr
 openssl x509 -noout -text -in server.crt
 
 # create a PEM version for IIS
+# in order for this to work, you need to generate a CSR within IIS, then copy
+# it over to a machine with OpenSSL installed.  Sign the key using the sign.sh
+# script above, then convert it to PEM format so IIS can read it again.
 
 openssl x509 -in server.crt -out server.crt.pem -outform PEM
 
