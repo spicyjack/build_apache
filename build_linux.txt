@@ -236,7 +236,8 @@ what it needs out of the source.
 --with-gdbm \
 --with-gettext \
 --with-imap=/usr/local/src/imap \
---with-openssl=/usr/local \
+--with-openssl=/usr \
+--with-ldap=/usr \
 --enable--sysvsem \
 --enable-sysvshm \
 --enable-force-cgi-redirect \
