@@ -1,4 +1,12 @@
-Building Apache, by Brian Manning - Last updated 14Nov2003
+Building Apache, by Brian Manning - Last updated 16Oct2004
+
+16Oct2004
+-- Apache 2.0.52
+-- PHP 5.0.2
+-- Added Ming SWF library
+-- OpenSSL 0.9.7d
+-- Removed MySQL and PostgreSQL database build instructions, added them to the
+build_solaris.txt file.
 
 14Nov2003
 -- added section on using tmpfs shared memory ramdisk for file storage
@@ -53,7 +61,7 @@ directories, with symlink shortcuts.
 Set up the install environment
 ------------------------------
 For the bash shell users:
-export PREFIX=/usr/local/apache-1.3.28
+export PREFIX=/usr/local/apache-2.0.52
 
 Apache (1st Time - http://httpd.apache.org/dist/httpd/)
 -------------------------------------------------------
@@ -176,173 +184,49 @@ IMAP (http://www.washington.edu/imap/)
 ----
 make slx
 
-MySQL (http://www.mysql.com/downloads/)
------
-The compile flags below are optional, but taken from the MySQL page at:
-<http://www.mysql.com/documentation/mysql/bychapter/manual_Installing.html#configure_options>
 
-CC=gcc CFLAGS="-O3" \
-CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti" \
-./configure --prefix=/usr/local/mysql --with-low-memory --enable-assembler
+PHP (http://www.php.net/downloads.php)
+--------------------------------------
+See below for more details about this specific build as well as other software
+dependencies that PHP requires before it will build.  If you are building IMAP,
+you just have to 'make' the source, you don't have to install it, PHP pulls
+what it needs out of the source.
 
-If you have a ultra sparc, you can get 4 % more performance by adding "-mcpu=v8
--Wa,-xarch=v8plusa" to CFLAGS and CXXFLAGS. 
+Since PHP disables 'register_globals' by default, if you have an application
+that uses global variables (variables read in from the HTTP server environment
+and/or HTTP POST variables), you can tell Apache to enable 'register_globals'
+on a per-directory basis.  Here's an example for PHP 4.3.x:
 
-# So my ./configure is:
+<Directory /path/to/some/php/application>
+        <IfModule sapi_apache2.c>
+            php_flag register_globals On
+            php_flag magic_quotes_gpc On
+            php_flag track_vars On
+        </IfModule>
+</Directory>
 
-[logan5][root /export/home/build/mysql-3.23.38]$ CC=gcc CFLAGS="-O3 -mcpu=v8" \
-CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti -mcpu=v8" \
-./configure --prefix=/export/home/mysql --with-low-memory --enable-assembler
+The trick is to grep for 'STANDARD20_MODULE_STUFF' in the PHP source to find
+thename of the C source file that contains the above string.  Place the
+filename of that C source file in the IfModule directive above, and Apache will
+then tell PHP to honor the directive for that directory.
 
-# then:
-
-make 
-make test
-make install
-
-# Change the perms in the mysql directory:
-
-chown -R root /export/home/mysql
-chown -R mysql /export/home/mysql/var
-chgrp -R mysql /export/home/mysql
-
-# cd to your installed directory, in this case /export/home/mysql, then run
-./bin/mysql_install_db
-
-# this sets up MySQL's auth system.
-
-# Log into mysql by using /export/home/mysql/bin/mysql, and enter the following:
-
-mysql> set password for root@localhost = password('password');
-
--and-
-
-mysql> set password for root@host.com = password('password');
+Built with Ming, MySQL and PostgreSQL, and GD drivers
  
- Copy the file 'mysql.server' to /etc/init.d as 'mysql', and make a symlink back
- from /etc/rc3.d to the file in /etc/init.d.  Also, to make the daemon run as
- user 'mysql', you'll need to add '--user=mysql' to the start) line in
- /etc/init.d/mysql.
+--with-ldap=/usr \
 
- PostgreSQL (http://postgresql.readysetnet.com/sites.html) [mirror]
- ----------
- PostgreSQL REQUIRES GNU make.  Also, you may need to reset some of the kernel's memory parameters.  
- <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-resources.html#SYSVIPC> will give you more dirt.
-
- adduser postgres (add the user to the system)
- su - postgres
-
- ./configure --prefix=/usr/local/pgsql \
- --with-openssl=/usr/local/ --enable-syslog
- make
- make install
-
- # initialize the data directory
- /usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
-
- # this will start the database with logging going to 'logfile'
- # use pg_ctl to start postgres from init scripts
- /usr/local/pgsql/bin/postmaster \
- -D /usr/local/pgsql/data >logfile 2>&1 &
-
- # create the test database
- /usr/local/pgsql/bin/createdb test
-
- # then open it up with the 'psql' command line client
- /usr/local/pgsql/bin/psql test
-
- If you want to run the regression tests, you can do so by going to the source
- directory and running 'make check' as the user 'postgres'.  Building postgres
- as the user 'postgres' is recommended if you plan to run the regression tests.
- If you build as root, then run the regression tests as 'postgres', the test
- won't be able to write over the files owned by root.
-
- I've created a PostgreSQL start/stop script that should come in handy, it's
- called 'postgres', and it should either live in the same CVS repository as this
- one, or in a repository called 'scripts'.  It will kill a database in both
- normal and immediate modes.
-
- To run Postgres in SSL mode, you'll need to put a 'server.key' and 'server.crt'
- in $PGSQL/data.  Otherwise, when you go to start the server, it won't start.
-
-
- PHP (http://www.php.net/downloads.php)
- See below for more details about this specific build as well as other software
- dependencies that PHP requires before it will build.  If you are building IMAP,
- you just have to 'make' the source, you don't have to install it, PHP pulls
- what it needs out of the source.
- --------
- 
- ./configure \
- --prefix=$PREFIX \
- --with-apxs=$PREFIX/bin/apxs \
- --with-config-file-path=/usr/local/apacheconf \
- --with-gd \
- --enable-gd-imgstrttf \
- --with-mm=/usr/local/lib \
- --with-zlib \
- --with-zlib-dir=/usr/lib \
- --with-xml \
- --with-gdbm \
- --with-gettext \
- --with-openssl=/usr \
- --with-ldap=/usr \
- --enable-sysvsem \
- --enable-sysvshm \
- --enable-force-cgi-redirect \
- --enable-calendar \
- --enable-inline-optimization \
- --enable-trans-sid \
- --enable-track-vars \
- --with-imap=/usr/local/src/apache/imap \
- --with-mysql=/usr \
- --with-pgsql=/usr \
- --with-oci8 
-
-# Another version
-./configure  --prefix=/usr/local/apache-1.3.22
---with-apxs=/usr/local/apache-1.3.22/bin/apxs
---with-imap-ssl=/usr/local/src/imap  --with-mysql=/usr
---with-config-file-path=/usr/local/apache-1.3.22/conf  --with-gd
---with-pgsql=/usr  --with-mm=/usr/local/lib  --with-zlib
---with-zlib-dir=/usr/lib  --with-xml  --with-gdbm --with-openssl=/usr
---enable-sysvsem  --enable-sysvshm  --enable-force-cgi-redirect
---enable-calendar  --enable-inline-optimization  --enable-trans-sid
---enable-track-vars --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib
+./configure  --prefix=/usr/local/apache-2.0.x \
+--with-apxs=/usr/local/apache-2.0.x/bin/apxs \
+--with-imap-ssl=/usr/local/src/imap \
+--with-config-file-path=/usr/local/apache2conf \
+--with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
+--with-pgsql=/usr --with-mysql=/usr --with-xpm-dir=/usr/X11R6 \
+--with-mm=/usr/local/lib  --with-zlib --with-gettext \
+--with-zlib-dir=/usr/lib  --with-xml  --with-gdbm --with-openssl=/usr \
+--enable-sysvsem  --enable-sysvshm  --enable-force-cgi-redirect \
+--enable-calendar  --enable-inline-optimization  --enable-trans-sid \
+--enable-track-vars --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib \
 --with-xpm-dir=/usr/X11R6/lib
 
-## Bob's version of his PHP install
- ./configure \
---prefix=/usr/local/apache-1.3.22 \
---with-apxs=/usr/local/apache-1.3.22/bin/apxs \
---with-imap=/home/lugz/web/imap-2001.RELEASE-CANDIDATE.1 \
---with-mysql=/usr/local/mysql \
---with-config-file-path=/usr/local/apache-1.3.22/conf \ 
---with-gd=/usr/lib \
---with-gd-dir=/usr/lib \
---with-mm=/usr/local/lib \
---with-zlib \
---with-zlib-dir=/usr/lib \
---with-xml \
---enable-gd-native-ttf \
---with-freetype-dir=/usr \
---with-xpm-dir=/usr/X11R6 \
---enable-gd-imgstrttf \
---with-jpeg-dir=/usr \
---with-png-dir=/usr \
---enable-inline-optimization \
---with-xml \
---with-openssl=/usr \
---with-gdbm \
---with-ldap=/usr/lib \
---enable-sysvsem \
---enable-sysvshm \ 
---enable-force-cgi-redirect \
---enable-calendar \
---enable-trans-sid \
---enable-track-vars \
---with-ming \
---with-pdflib 
 
 make
 make install

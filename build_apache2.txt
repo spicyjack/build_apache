@@ -73,21 +73,12 @@ make
 Then compile Apache:
 
 ./configure \
---prefix=$PREFIX \
---with-ssl=$PREFIX \
---enable-auth-dbm \
---enable-auth-digest \
---enable-dav \
---enable-dav-fs \
---enable-info \
---enable-rewrite \
---enable-proxy \
---enable-ssl \
---enable-usertrack \
---enable-vhost-alias \
---enable-static-htpasswd \
---enable-static-ab \
---enable-mods-shared=all \
+--prefix=$PREFIX --with-ssl=$PREFIX \
+--enable-auth-dbm  --enable-auth-digest \
+--enable-dav --enable-dav-fs \
+--enable-info --enable-rewrite --enable-proxy \
+--enable-ssl --enable-usertrack  --enable-vhost-alias \
+--enable-static-htpasswd --enable-static-ab --enable-mods-shared=all \
 --with-mpm=prefork
 
 make
@@ -133,59 +124,47 @@ then compile IMAP with:
 
 make slx
 
-PostgreSQL 7.3.x (http://www.postgresql.org/mirrors-ftp.html)
-----------------
-PostgreSQL REQUIRES GNU make.  If you don't have it, you'll need to go get it
-from Sunfreeware.com.  Also, you may need to reset some of the kernel's memory
-parameters.  <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-r
-esources.html#SYSVIPC> will give you more dirt.
-
-./configure --prefix=/export/home/postgres --with-openssl=/usr/local/ssl \
---with-includes=/usr/local/includes 
-
-make
-make install
-
-adduser postgres (add the user to the system)
-chown postgres /export/home/postgres/data
-su - postgres
-/export/home/postgres/bin/initdb -D /export/home/postgres/data
-
-MySQL 3.23.xx (http://www.mysql.com/downloads/)
------------------------------------------------
-Use the following lines to configure/compile MySQL:
-
-CC=gcc CFLAGS="-O3 -fno-omit-frame-pointer -mcpu=v8 -Wa,-xarch=v8plusa" \
-CXX=gcc \ 
-CXXFLAGS="-O3 -fno-omit-frame-pointer -felide-constructors -fno-exceptions \
--fno-rtti -mcpu=v8 -Wa,-xarch=v8plusa" \
-./configure --prefix=/export/home/mysql \
---with-extra-charsets=complex --enable-thread-safe-client\
---enable-local-infile --enable-assembler --with-named-z-libs=no\
---with-named-curses-libs=-lcurses --disable-shared 
-
-make
-make install
-
-The basic commands you must execute to install and use a MySQL binary
-distribution are:
-
-     shell> cd /usr/local
-     shell> gunzip < /path/to/mysql-VERSION-OS.tar.gz | tar xvf -
-     shell> ln -s full-path-to-mysql-VERSION-OS mysql
-     shell> cd mysql
-     shell> scripts/mysql_install_db
-     shell> chown -R root  .
-     shell> chown -R mysql data
-     shell> chgrp -R mysql .
-     shell> bin/mysqld_safe --user=mysql &
-     or
-     shell> bin/mysqld_safe --user=mysql &
-     if you are running MySQL 4.x
-
-
-PHP 4.3.x (http://www.php.net/download)
+Ming SWF Libraries (http://ming.sf.net)
 ---------------------------------------
+Run 'make' in the ming source directory.  Copy 'libming.so' to /usr/local/lib
+as 'libming.so.0', and create a symlink from that file to 'libming.so'. Copy
+ming.h to /usr/local/include.
+
+libxml2 (http://xmlsoft.org/sources/)
+-------------------------------------
+PHP 5.0.x wants recent versions of libxml2.  I can provide
+
+-> libxml2
+./configure --with-zlib --disable-static
+-> libgpg-error (for libgcrypt, ftp://ftp.gnupg.org/gcrypt/libgpg-error/)
+./configure --disable-static
+-> libgcrypt (for libxslt, ftp://ftp.gnupg.org/gcrypt/libgcrypt/)
+./configure --disable-static
+-> libxlst (same website)
+./configure --with-libxml-src=../libxml2-2.6.14 --disable-static
+
+
+PHP 5.0.x (http://www.php.net/download)
+---------------------------------------
+Since PHP disables 'register_globals' by default, if you have an application
+that uses global variables (variables read in from the HTTP server environment
+and/or HTTP POST variables), you can tell Apache to enable 'register_globals'
+on a per-directory basis.  Here's an example for PHP 4.3.x:
+
+<Directory /path/to/some/php/application>
+        <IfModule mod_php5.c>
+            php_flag register_globals On
+            php_flag magic_quotes_gpc On
+            php_flag track_vars On
+        </IfModule>
+</Directory>
+
+The trick is to grep for 'STANDARD20_MODULE_STUFF' in the PHP source to find
+thename of the C source file that contains the above string.  Place the 
+filename of that C source file in the IfModule directive above, and Apache will
+then tell PHP to honor the directive for that directory. 
+
+Built with Ming, MySQL and PostgreSQL, and GD drivers
 
 # need oracle client package
 # need zlib headers
@@ -193,25 +172,18 @@ PHP 4.3.x (http://www.php.net/download)
 # need postresql-dev package, which has header files
 
 ./configure --prefix=$PREFIX \
---with-apxs2=$PREFIX/bin/apxs \
---with-config-file-path=$PREFIX/conf \
---with-mysql \
---with-pgsql \
---with-zlib-dir=/lib \
---with-xml \
---with-pear \
---with-openssl=$PREFIX \
---with-gdbm \
---with-gettext \
---enable--sysvsem \
---enable-sysvshm \
---enable-force-cgi-redirect \
---enable-calendar \
---enable-inline-optimization \
---enable-trans-sid \
---enable-track-var \
---with-gd \
---with-imap=/usr/local/src/apache/imap
+--with-apxs2=$PREFIX/bin/apxs --with-config-file-path=$PREFIX/conf \
+--with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
+--with-mysql --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+--enable-sqlite-utf8 --with-pgsql --with-zlib-dir=/lib \
+--with-xml --with-pear --with-openssl=$PREFIX \
+--with-gdbm --with-xpm-dir=/usr/X11R6 --with-gettext \
+--enable--sysvsem --enable-sysvshm --enable-force-cgi-redirect \
+--enable-calendar --enable-inline-optimization \
+--enable-trans-sid --enable-track-var \
+--with-imap=/usr/local/src/apache/imap \
+--with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib \
+--with-ming --with-mm=$PREFIX/lib --disable-short-tags
 
 make
 sudo make install

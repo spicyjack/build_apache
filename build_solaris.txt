@@ -156,6 +156,23 @@ SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
 
 MySQL (http://www.mysql.com/downloads/)
 -----
+The compile flags below are optional, but taken from the MySQL page at:
+<http://www.mysql.com/documentation/mysql/bychapter/manual_Installing.html#confi
+gure_options>
+
+CC=gcc CFLAGS="-O3" \
+CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti" \
+./configure --prefix=/usr/local/mysql --with-low-memory --enable-assembler
+
+If you have a ultra sparc, you can get 4 % more performance by adding "-mcpu=v8
+-Wa,-xarch=v8plusa" to CFLAGS and CXXFLAGS.
+
+# So my ./configure is:
+
+[logan5][root /export/home/build/mysql-3.23.38]$ CC=gcc CFLAGS="-O3 -mcpu=v8" \
+CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti -mcpu=v8" \
+./configure --prefix=/export/home/mysql --with-low-memory --enable-assembler
+
 ./configure --mandir=$PREFIX/man --prefix=$PREFIX/mysql-version.number \
 --enable-assembler --with-mysqld-user=mysql 
 # then:
@@ -198,6 +215,14 @@ adduser postgres (add the user to the system)
 su - postgres
 export PREFIX=/export/home/apps/apache-1.3.26
 
+ adduser postgres (add the user to the system)
+ su - postgres
+ 
+./configure --prefix=/usr/local/pgsql \
+--with-openssl=/usr/local/ --enable-syslog
+make 
+make install
+
 ./configure --prefix=$PREFIX/postgres-7.2.1 --mandir=$PREFIX/man \
 --with-openssl=$PREFIX --with-includes=$PREFIX/include --enable-syslog
 make
@@ -229,6 +254,8 @@ called 'postgres', and it should either live in the same CVS repository as this
 one, or in a repository called 'scripts'.  It will kill a database in both
 normal and immediate modes.
 
+To run Postgres in SSL mode, you'll need to put a 'server.key' and 'server.crt'
+in $PGSQL/data.  Otherwise, when you go to start the server, it won't start.
 
 PHP (http://www.php.net/downloads.php)
 (See below for more details about this specific build as well as other software
