@@ -196,18 +196,18 @@ make
 make install
 
 # initialize the data directory
-/export/home/postgres/bin/initdb -D /export/home/postgres/data
+/usr/local/pgsql/bin/initdb -D /usr/local/pgsql/data
 
 # this will start the database with logging going to 'logfile'
 # use pg_ctl to start postgres from init scripts
-/export/home/postgres/bin/postmaster \
--D /export/home/postgres/data >logfile 2>&1 &
+/usr/local/pgsql/bin/postmaster \
+-D /usr/local/pgsql/data >logfile 2>&1 &
 
 # create the test database
-/export/home/postgres/bin/createdb test
+/usr/local/pgsql/bin/createdb test
 
 # then open it up with the 'psql' command line client
-/export/home/postgres/bin/psql test
+/usr/local/pgsql/bin/psql test
 
 If you want to run the regression tests, you can do so by going to the source
 directory and running 'make check' as the user 'postgres'.  Building postgres
@@ -220,6 +220,9 @@ called 'postgres', and it should either live in the same CVS repository as this
 one, or in a repository called 'scripts'.  It will kill a database in both
 normal and immediate modes.
 
+To run Postgres in SSL mode, you'll need to put a 'server.key' and 'server.crt'
+in $PGSQL/data.  Otherwise, when you go to start the server, it won't start.
+
 
 PHP (http://www.php.net/downloads.php)
 See below for more details about this specific build as well as other software
@@ -230,9 +233,10 @@ what it needs out of the source.
 ./configure \
 --prefix=/usr/local/apache-1.3.20 \
 --with-apxs=/usr/local/apache-1.3.20/bin/apxs \
+--with-imap=/usr/local/src/imap \
+--with-mysql=/usr \
 --with-config-file-path=/usr/local/apache-1.3.20/conf \
 --with-gd \
---with-mysql=/usr \
 --with-pgsql=/usr/local/pgsql \
 --with-mm=/usr/local/lib \
 --with-zlib \
@@ -240,7 +244,6 @@ what it needs out of the source.
 --with-xml \
 --with-gdbm \
 --with-gettext \
---with-imap=/usr/local/src/imap \
 --with-openssl=/usr \
 --with-ldap=/usr \
 --enable--sysvsem \
