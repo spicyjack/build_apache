@@ -8,23 +8,25 @@ document.
 
 
 OpenSSL (http://www.openssl.org/source/)
--------------
+----------------------------------------
 ./config --prefix=/usr/local --openssldir=/usr/local
 make
 sudo make install
 
+# Note, the Solaris 8 refsystem here already has Openssl installed in
+# /usr/local/openssl.  Overwrite it at your peril.
+
 MM (http://www.engelschall.com/sw/mm/#tarballs)
---------
-#./configure --disable-shared
+-----------------------------------------------
 ./configure
 make
 sudo make install
 
 mod_ssl (http://www.modssl.org/source/)
-------------------------------
+---------------------------------------
 ./configure \
---with-apache=/usr/local/src/apache/apache_1.3.12 \
---with-ssl=/usr/local/ssl \
+--with-apache=/export/home/build/apache_1.3.20 \
+--with-ssl=/usr/local/openssl \
 --enable-shared=ssl
 
 Upgrades to mod_ssl
@@ -39,11 +41,11 @@ sudo make install
 make distclean
 
 Apache (http://httpd.apache.org/dist/httpd/)
--------------
-SSL_BASE=/usr/local \
-EAPI_MM=/usr/local/src/apache/mm-1.1.3 \
+--------------------------------------------
+SSL_BASE=/usr/local/openssl \
+EAPI_MM=/export/home/build/mm-1.1.3 \
 ./configure \
---prefix=/usr/local/apache \
+--prefix=/export/home/apache \
 --enable-module=ssl \
 --enable-module=most \
 --enable-shared=max \
@@ -72,28 +74,30 @@ CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti" \
 If you have a ultra sparc, you can get 4 % more performance by adding "-mcpu=v8
 -Wa,-xarch=v8plusa" to CFLAGS and CXXFLAGS. 
 
-So my ./configure is:
+# So my ./configure is:
 
 [logan5][root /export/home/build/mysql-3.23.38]$ CC=gcc CFLAGS="-O3 -mcpu=v8" \
 CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti -mcpu=v8" \
 ./configure --prefix=/export/home/mysql --with-low-memory --enable-assembler
 
-then:
+# then:
 
 make 
 make test
 make install
 
-Change the perms in the mysql directory:
+# Change the perms in the mysql directory:
 
 chown -R root /export/home/mysql
 chown -R mysql /export/home/mysql/var
 chgrp -R mysql /export/home/mysql
 
-cd to your installed directory, in this case /export/home/mysql, then run
+# cd to your installed directory, in this case /export/home/mysql, then run
 ./bin/mysql_install_db
 
-Log into mysql by using /export/home/mysql/bin/mysql, and enter the following:
+# this sets up MySQL's auth system.
+
+# Log into mysql by using /export/home/mysql/bin/mysql, and enter the following:
 
 mysql> set password for root@localhost = password('password');
 
@@ -136,8 +140,8 @@ make install
 
 If you want to run the regression tests, you can do so by going to the source
 directory and running 'make check' as the user 'postgres'.  Building postgres
-as the user 'postgres' is recommended if you plan to run the regression tests,
-if you build as root, if you run the regression tests as 'postgres', the test
+as the user 'postgres' is recommended if you plan to run the regression tests.
+If you build as root, then run the regression tests as 'postgres', the test
 won't be able to write over the files owned by root.
 
 I've created a PostgreSQL start/stop script that should come in handy, it's
@@ -173,7 +177,7 @@ dependencies that PHP requires before it will build)
 make
 make install
 
-cp php.ini-dist /usr/local/apache/conf/php.ini
+cp php.ini-dist /export/home/apache/conf/php.ini
 
 Add the following directives to Apache's httpd.conf file:
 	AddType application/x-httpd-php .php
