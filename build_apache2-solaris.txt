@@ -1,0 +1,22 @@
+Apache 2.0.xx
+-------------
+
+set a PREFIX:
+
+export PREFIX=/usr/local/apache-2.0.44
+
+unpack the tarball, cd into the source directory.  To get a full listing of
+compile options you can set in Apache, use './configure --help'
+
+./configure \
+--prefix=$PREFIX \
+--enable-auth-dbm \
+--enable-example \
+--enable-usertrack \
+--enable-ssl \
+--with-ssl=/usr/local/ssl \
+--enable-static-htpasswd \
+--enable-static-ab \
+--enable-mods-shared=all \
+--with-mpm=worker
+
