@@ -81,6 +81,7 @@ compile options you can set in Apache, use './configure --help'
 --prefix=$PREFIX \
 --enable-auth-dbm \
 --enable-example \
+--enable-mem-cache \
 --enable-usertrack \
 --enable-ssl \
 --with-ssl=$PREFIX \
