@@ -431,7 +431,7 @@ Is the information correct? [y/n] y
 
 
 Generating SSL certificates
- ===========================
+===========================
 For the initial SSL cert generation, you can use 'make certificate type=CUSTOM'
 inside of Apache.  This will generate both the custom Certificate Authority
 (CA) certificate (ca.crt) , and the server's certificate (server.crt).  Once
