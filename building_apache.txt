@@ -4,8 +4,6 @@ By Brian Manning
 Last Updated Sep 28 1999
 
 
-FIXME - Try debugging the script using bash -x
-
 1) unpack all of the tarballs into one directory. make sure that MySQL is
 already installed
 
@@ -126,7 +124,11 @@ cd ../apache_1.3.9
 SSL_BASE=../openssl-0.9.4 \
 EAPI_MM=../mm-1.0.11 \
 ./configure --prefix=/usr/local \
+--enable-module=most \
+--enable-rule=SHARED_CORE \
+--enable-module=so \
 --enable-module=ssl \
+--enable-shared=max \
 --activate-module=src/modules/php3/libphp3.a \
 --activate-module=src/modules/perl/libperl.a 
 
