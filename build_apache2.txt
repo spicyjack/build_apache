@@ -182,7 +182,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 --enable-calendar --enable-inline-optimization \
 --enable-trans-sid --enable-track-var \
 --with-imap=/usr/local/src/apache/imap \
---with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib \
+--with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib --enable-exif \
 --with-ming --with-mm=$PREFIX/lib --disable-short-tags
 
 make
