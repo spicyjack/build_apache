@@ -1,7 +1,5 @@
-Pre-install of all software:
+Pre-install: set a PREFIX
 ----------------------------
-set a PREFIX:
-
 for Solaris:
 export PREFIX=/export/home/apache-2.0.xx (where xx is the version you are
 compiling)
@@ -12,6 +10,36 @@ compiling)
 
 If you have any existing symlinks in place for your existing Apache install,
 best remove them or they may get stomped.
+
+Pre-install: create some lusers for various pieces of software to run as
+------------------------------------------------------------------------
+** for MySQL on all platforms:
+
+shell> groupadd -g 775 mysql
+shell> useradd -u 3010 -g mysql -d /export/home/mysql mysql
+
+Change the above user/group ID's as needed
+
+** Adding the Apache runtime users on Solaris:
+
+shell> groupadd -g 710 webuser
+shell> useradd -u 110 -g webuser -d /export/home/apache www
+
+** Adding the Apache runtime users on Debian GNU/Linux:
+shell> addgroup --gid 65533 httpd
+shell> adduser --no-create-home --gid 65533 --uid 65533 \
+		--disabled-password httpd
+Adding user httpd...
+Adding new user httpd (65533) with group httpd.
+Home directory /home/httpd already exists.  Not copying from /etc/skel
+Changing the user information for httpd
+Enter the new value, or press return for the default
+Full Name []: Apache Runtime User
+Room Number []:
+Work Phone []:
+Home Phone []:
+Other []:
+Is the information correct? [y/n] y
 
 MM (http://www.engelschall.com/sw/mm/#tarballs)
 -----------------------------------------------
@@ -82,8 +110,6 @@ make install
 The basic commands you must execute to install and use a MySQL binary
 distribution are:
 
-     shell> groupadd -g 775 mysql 
-     shell> useradd -u 3010 -g mysql -d /export/home/mysql mysql
      shell> cd /usr/local
      shell> gunzip < /path/to/mysql-VERSION-OS.tar.gz | tar xvf -
      shell> ln -s full-path-to-mysql-VERSION-OS mysql
@@ -103,16 +129,23 @@ Apache 2.0.xx
 unpack the tarball, cd into the source directory.  To get a full listing of
 compile options you can set in Apache, use './configure --help'
 
+Before you compile the main httpd binary with LDAP support, you'll need to
+first compile the 'apr-util' with LDAP support as well:
+
+cd $APACHE_SRC/srclib/apr-util
+./configure --with-ldap --with-dbm=gdbm --with-apr=../apr
+make
+
+Then compile Apache:
+
 ./configure \
 --prefix=$PREFIX \
 --with-ssl=$PREFIX \
 --enable-auth-dbm \
 --enable-auth-digest \
---enable-auth-ldap \
 --enable-dav \
 --enable-dav-fs \
 --enable-info \
---enable-ldap \
 --enable-rewrite \
 --enable-proxy \
 --enable-ssl \
@@ -126,12 +159,13 @@ compile options you can set in Apache, use './configure --help'
 make
 sudo make install
 
---with-ssl=$PREFIX doesn't work for some reason.  Check the apache
-source/readme, see if you can figure out how to get Apache to use ssl libs that
-are located in a different place than you expect
+Change the User and Group in httpd.conf that the webserver will run as to the
+user/group you created at the top of this file.
 
 # --enable-example \ # for development only
 # --enable-so \ # enabled when --enable-shared-mods is used as well
+# --enable-ldap=/usr \ # having problems compiling ldap
+# --enable-auth-ldap \ # having problems compiling ldap
 
 For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
 modules don't get linked correctly against libgcc.a.  This is because the
@@ -149,11 +183,6 @@ For mod_ssl, chances are Apache won't link to the correct archived library
 the ssl directory)
 
 See also the OpenSSL thread at the bottom of this file.
-
-Adding the Apache runtime users:
-
-shell> groupadd -g 710 webuser
-shell> useradd -u 110 -g webuser -d /export/home/apache www
 
 PHP 4.3.x (http://www.php.net/download)
 ---------------------------------------
