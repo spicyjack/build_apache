@@ -95,6 +95,11 @@ compile options you can set in Apache, use './configure --help'
 --enable-mods-shared=all \
 --with-mpm=worker
 
+--with-ssl=$PREFIX doesn't work for some reason.  Check the apache
+source/readme, see if you can figure out how to get Apache to use ssl libs that
+are located in a different place than you expect
+
+
 [observer][httpd-2.0.44 550] ./configure --prefix=$PREFIX \
 > --enable-auth-dbm --enable-file-cache --enable-mem-cache \
 > --enable-dav --enable-info --enable-cgi --enable-dav-fs \
