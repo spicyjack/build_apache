@@ -263,6 +263,17 @@ mysql> set password for root@host.com = password('password');
  --enable-trans-sid \
  --enable-track-vars
 
+./configure  --prefix=/usr/local/apache-1.3.22
+--with-apxs=/usr/local/apache-1.3.22/bin/apxs
+--with-imap-ssl=/usr/local/src/imap  --with-mysql=/usr
+--with-config-file-path=/usr/local/apache-1.3.22/conf  --with-gd
+--with-pgsql=/usr  --with-mm=/usr/local/lib  --with-zlib
+--with-zlib-dir=/usr/lib  --with-xml  --with-gdbm --with-openssl=/usr
+--enable-sysvsem  --enable-sysvshm  --enable-force-cgi-redirect
+--enable-calendar  --enable-inline-optimization  --enable-trans-sid
+--enable-track-vars --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib
+--with-xpm-dir=/usr/X11R6/lib
+
 ## Bob's version of his PHP install
  ./configure \
 --prefix=/usr/local/apache-1.3.22 \
