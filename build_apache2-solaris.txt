@@ -3,7 +3,8 @@ Pre-install of all software:
 set a PREFIX:
 
 for Solaris:
-export PREFIX=/export/home/apache
+export PREFIX=/export/home/apache-2.0.xx (where xx is the version you are
+compiling)
 
 for Linux:
 export PREFIX=/usr/local/apache-2.0.xx (where xx is the version you are
@@ -24,8 +25,6 @@ PostgreSQL REQUIRES GNU make.  If you don't have it, you'll need to go get it
 from Sunfreeware.com.  Also, you may need to reset some of the kernel's memory
 parameters.  <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-r
 esources.html#SYSVIPC> will give you more dirt.
-
-adduser postgres (add the user to the system)
 
 ./configure --prefix=/export/home/postgres --with-openssl=/usr/local/ssl \
 --with-includes=/usr/local/includes 
@@ -54,6 +53,25 @@ CXXFLAGS="-O3 -fno-omit-frame-pointer -felide-constructors -fno-exceptions \
 make
 make install
 
+The basic commands you must execute to install and use a MySQL binary
+distribution are:
+
+     shell> groupadd -g 775 mysql 
+     shell> useradd -u 3010 -g mysql -d /export/home/mysql mysql
+     shell> cd /usr/local
+     shell> gunzip < /path/to/mysql-VERSION-OS.tar.gz | tar xvf -
+     shell> ln -s full-path-to-mysql-VERSION-OS mysql
+     shell> cd mysql
+     shell> scripts/mysql_install_db
+     shell> chown -R root  .
+     shell> chown -R mysql data
+     shell> chgrp -R mysql .
+     shell> bin/mysqld_safe --user=mysql &
+     or
+     shell> bin/mysqld_safe --user=mysql &
+     if you are running MySQL 4.x
+
+
 Apache 2.0.xx
 -------------
 unpack the tarball, cd into the source directory.  To get a full listing of
@@ -79,7 +97,7 @@ compile options you can set in Apache, use './configure --help'
 > --enable-mods-shared=all
 
 
-For Apache 2.0.44 on Solaris, if you compile using GCC, some of the Apache
+For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
 modules don't get linked correctly against libgcc.a.  See the below URL's for
 more info and solutions:
 
