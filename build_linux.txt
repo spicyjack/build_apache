@@ -13,9 +13,6 @@ OpenSSL (http://www.openssl.org/source/)
 make
 sudo make install
 
-# Note, the Solaris 8 refsystem here already has Openssl installed in
-# /usr/local/openssl.  Overwrite it at your peril.
-
 MM (http://www.engelschall.com/sw/mm/#tarballs)
 -----------------------------------------------
 ./configure
@@ -25,14 +22,14 @@ sudo make install
 mod_ssl (http://www.modssl.org/source/)
 ---------------------------------------
 ./configure \
---with-apache=/export/home/build/apache_1.3.20 \
---with-ssl=/usr/local/openssl \
+--with-apache=/usr/local/src/apache/apache_1.3.20 \
+--with-ssl=/usr/local \
 --enable-shared=ssl
 
 Upgrades to mod_ssl
 -------------------
 ./configure \
---with-apxs=/export/home/apache \
+--with-apxs=/usr/local/apache/bin \
 --with-ssl=/usr/local \
 --with-mm=/usr/local
 
@@ -42,10 +39,10 @@ make distclean
 
 Apache (http://httpd.apache.org/dist/httpd/)
 --------------------------------------------
-SSL_BASE=/usr/local/openssl \
-EAPI_MM=/usr/local/src/mm-1.1.3 \
+SSL_BASE=/usr/local \
+EAPI_MM=/usr/local/src/apache/mm-1.1.3 \
 ./configure \
---prefix=/export/home/apache \
+--prefix=/usr/local/apache \
 --enable-module=ssl \
 --enable-module=most \
 --enable-shared=max \
