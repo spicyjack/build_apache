@@ -268,7 +268,7 @@ mysql> set password for root@host.com = password('password');
  --with-apxs=$PREFIX/bin/apxs \
  --with-imap=/usr/local/src/apache/imap \
  --with-mysql=/usr \
- --with-config-file-path=/usr/local/apache_conf \
+ --with-config-file-path=/usr/local/apacheconf \
  --with-gd \
  --enable-gd-imgstrttf \
  --with-pgsql=/usr \

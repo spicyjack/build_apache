@@ -198,8 +198,8 @@ adduser postgres (add the user to the system)
 su - postgres
 export PREFIX=/export/home/apps/apache-1.3.26
 
-./configure --prefix=$PREFIX/postgres-7.1.3 --mandir=$PREFIX/man \
---with-openssl=$PREFIX/ssl --with-includes=$PREFIX/include --enable-syslog
+./configure --prefix=$PREFIX/postgres-7.2.1 --mandir=$PREFIX/man \
+--with-openssl=$PREFIX --with-includes=$PREFIX/include --enable-syslog
 make
 make install
 
