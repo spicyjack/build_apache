@@ -1,8 +1,50 @@
 OpenSSL 0.9.6
 -------------
-./config --prefix=/usr/local/lib --openssldir=/usr/local/ssl
+./config --prefix=/usr/local --openssldir=/usr/local
 make
 sudo make install
+
+MM 1.1.3
+--------
+./configure --disable-shared
+make
+sudo make install
+
+mod_ssl 2.6.5 -> Apache 1.3.12
+------------------------------
+./configure \
+--with-apache=/usr/local/src/apache/apache_1.3.12 \
+--with-ssl=/usr/local/ssl \
+--enable-shared=ssl
+
+Upgrades
+--------
+./configure \
+--with-apxs=/usr/local/apache \
+--with-ssl=/usr/local/ssl \
+--with-mm=/usr/local/src/apache/mm-1.1.3
+
+make
+sudo make install
+make distclean
+
+Apache 1.3.12
+-------------
+SSL_BASE=/usr/local \
+EAPI_MM=/usr/local/src/apache/mm-1.1.3 \
+./configure \
+--enable-module=ssl \
+--enable-module=most \
+--enable-shared=max \
+--enable-rule=SHARED_CORE \
+--enable-rule=SHARED_CHAIN \
+--prefix=/usr/local \
+--enable-module=so
+
+make
+make certificate
+sudo make install
+
 
 PHP 4.02
 --------
@@ -17,6 +59,16 @@ PHP 4.02
 --with-zlib=/usr/lib \
 --enable-track-vars
 
+mod_perl
+--------
+perl Makefile.PL \
+USE_APXS=1 \
+WITH_APXS=/usr/local/apache/bin/apxs \
+EVERYTHING=1
+
+
+FastCGI
+-------
 /usr/local/apache/bin/apxs -o mod_fastcgi.so -c *.c
 sudo /usr/local/apache/bin/apxs -i -a -n fastcgi mod_fastcgi.so 
 	
