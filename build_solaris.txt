@@ -6,10 +6,29 @@ clients out there, like TWIG (http://twig.screwdriver.net/) or IMP/HORDE
 (http://www.horde.org).  More verbose instructions are at the bottom of this
 document.
 
+Preliminary
+-----------
+Download all the below listed packages that you want to use.  Place them all in
+one directory, and unzip them.  This will be referred to the 'build' directory.
+Inside the build directory, make symlinks to the directories containing the
+source, as the source packages will be referred in these instructions by the
+name of the directory without any version information.  For example, make a
+symlink from 'apache-1.3.x' to 'apache' in the source directory.  The
+destination of all the software will be the name of the Apache version; if you
+are installing Apache 1.3.23 to /export/home, then the full path will be
+/export/home/apache-1.3.23, and a symlink will be made from the install
+directory to /export/home/apache.  Applications that are installed inside the
+Apache tree will also use their full versions into the installation
+directories, with symlink shortcuts.
+
+Set up the install environment
+------------------------------
+For the bash shell users:
+export PREFIX=/export/home/apache-1.3.23
 
 OpenSSL (http://www.openssl.org/source/)
 ----------------------------------------
-./config --prefix=/usr/local --openssldir=/usr/local
+./config --prefix=$PREFIX
 make
 sudo make install
 
