@@ -190,8 +190,8 @@ PostgreSQL REQUIRES GNU make.  Also, you may need to reset some of the kernel's 
 adduser postgres (add the user to the system)
 su - postgres
 
-./configure --prefix=/export/home/postgres \
---with-openssl=/export/home/openssl --enable-syslog
+./configure --prefix=/usr/local/pgsql \
+--with-openssl=/usr/local/ --enable-syslog
 make
 make install
 
