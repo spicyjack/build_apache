@@ -3,8 +3,8 @@ Building Apache, by Brian Manning - Last updated May 21st, 2001
 Following is a listing of build steps for each part of Apache.  Anything past
 Apache is optional.  This setup will get you enough stuff to run most webmail
 clients out there, like TWIG (http://twig.screwdriver.net/) or IMP/HORDE
-(http://www.horde.org).  More verbose instructions are at the bottom of this
-document.
+(http://www.horde.org).  Read the whole document first to get a better idea of
+what's presented here, as there's comments all throughout the file.
 
 Preliminary
 -----------
@@ -37,15 +37,15 @@ sudo make install
 
 MM (http://www.engelschall.com/sw/mm/#tarballs)
 -----------------------------------------------
-./configure
+./configure --prefix=$PREFIX
 make
 sudo make install
 
 mod_ssl (http://www.modssl.org/source/)
 ---------------------------------------
 ./configure \
---with-apache=/export/home/build/apache_1.3.20 \
---with-ssl=/usr/local/openssl \
+--with-apache=/export/home/files/build/apache_1.3.23 \
+--with-ssl=/export/home/apps/apache-1.3.23 \
 --enable-shared=ssl
 
 Upgrades to mod_ssl
@@ -61,10 +61,10 @@ make distclean
 
 Apache (http://httpd.apache.org/dist/httpd/)
 --------------------------------------------
-SSL_BASE=/usr/local/openssl \
-EAPI_MM=/export/home/build/mm-1.1.3 \
+SSL_BASE=$PREFIX \
+EAPI_MM=/export/home/files/build/mm-1.1.3 \
 ./configure \
---prefix=/export/home/apache \
+--prefix=$PREFIX \
 --enable-module=ssl \
 --enable-module=most \
 --enable-shared=max \
