@@ -1,10 +1,52 @@
-Apache 2.0.xx
--------------
-
+Pre-install of all software:
+----------------------------
 set a PREFIX:
 
-export PREFIX=/usr/local/apache-2.0.44
+export PREFIX=/export/home/apache
 
+OpenSSL (http://www.openssl.org/source/)
+----------------------------------------
+./config --prefix=$PREFIX
+make
+sudo make install
+
+PostgreSQL 7.3.x (http://www.postgresql.org/mirrors-ftp.html)
+----------------
+PostgreSQL REQUIRES GNU make.  If you don't have it, you'll need to go get it
+from Sunfreeware.com.  Also, you may need to reset some of the kernel's memory
+parameters.  <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-r
+esources.html#SYSVIPC> will give you more dirt.
+
+adduser postgres (add the user to the system)
+export PREFIX=/export/home/postgres
+
+./configure --prefix=$PREFIX --with-openssl=/usr/local/ssl \
+--with-includes=/usr/local/includes 
+
+make
+make install
+
+adduser postgres (add the user to the system)
+chown postgres $PREFIX/data
+su - postgres
+export PREFIX=/export/home/postgres
+$PREFIX/bin/initdb -D $PREFIX/data
+
+MySQL 3.23.xx (http://www.mysql.com/downloads/)
+-----------------------------------------------
+Use the following lines to configure/compile MySQL:
+
+CC=gcc CFLAGS="-O3 -fno-omit-frame-pointer -mcpu=v8 -Wa,-xarch=v8plusa" \
+CXX=gcc \ 
+CXXFLAGS="-O3 -fno-omit-frame-pointer -felide-constructors -fno-exceptions \
+-fno-rtti -mcpu=v8 -Wa,-xarch=v8plusa" \
+./configure --prefix=/export/home/mysql \
+--with-extra-charsets=complex --enable-thread-safe-client\
+--enable-local-infile --enable-assembler --with-named-z-libs=no\
+--with-named-curses-libs=-lcurses --disable-shared 
+
+Apache 2.0.xx
+-------------
 unpack the tarball, cd into the source directory.  To get a full listing of
 compile options you can set in Apache, use './configure --help'
 
