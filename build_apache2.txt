@@ -170,17 +170,22 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 # need zlib headers
 # need gdbm headers
 # need postresql-dev package, which has header files
+# removed ming libs, didn't want (03Mar2005)
+# added kerberos support cause c-client Debian package wants it (03Mar2005)
+# copy out the file mm.h to /usr/local/include so that PHP can find it
 
-./configure --prefix=$PREFIX --with-apxs2=$PREFIX/bin/apxs
---with-config-file-path=$PREFIX/conf --with-gd --enable-gd-imgstrttf
---with-freetype-dir=/usr --with-mysql
---with-mysql-sock=/var/run/mysqld/mysqld.sock --enable-sqlite-utf8 --with-pgsql
---with-zlib-dir=/lib --with-xml --with-pear --with-openssl=/usr --with-gdbm
---with-xpm-dir=/usr/X11R6 --with-gettext --enable--sysvsem --enable-sysvshm
---enable-force-cgi-redirect --enable-calendar --enable-inline-optimization
---enable-trans-sid --enable-track-var --with-imap=/usr/lib
---with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib --enable-exif
---with-mm=/usr/lib --disable-short-tags  --with-kerberos
+./configure --prefix=$PREFIX --with-apxs2=$PREFIX/bin/apxs 
+--with-config-file-path=$PREFIX/conf \
+--with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
+--with-mysql --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+--enable-sqlite-utf8 --with-pgsql --with-zlib-dir=/lib \
+--with-xml --with-pear --with-openssl=$PREFIX \
+--with-gdbm --with-xpm-dir=/usr/X11R6 --with-gettext \
+--enable--sysvsem --enable-sysvshm --enable-force-cgi-redirect \
+--enable-calendar --enable-inline-optimization \
+--enable-trans-sid --enable-track-var --with-imap \
+--with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib --enable-exif \
+--with-mm --disable-short-tags --with-kerberos
 
 make
 sudo make install
