@@ -24,7 +24,10 @@ directories, with symlink shortcuts.
 Set up the install environment
 ------------------------------
 For the bash shell users:
-export PREFIX=/export/home/apps/apache-1.3.23
+export PREFIX=/export/home/apps/apache-1.3.26
+
+For the unified reference system:
+export PATH=/usr/gnu/bin/:$PATH
 
 OpenSSL (http://www.openssl.org/source/)
 ----------------------------------------
@@ -44,8 +47,8 @@ sudo make install
 mod_ssl (http://www.modssl.org/source/)
 ---------------------------------------
 ./configure \
---with-apache=/export/home/files/build/apache_1.3.23 \
---with-ssl=/export/home/apps/apache-1.3.23 \
+--with-apache=/export/home/files/build/apache_1.3.26 \
+--with-ssl=$PREFIX \
 --enable-shared=ssl
 
 Upgrades to mod_ssl
@@ -193,6 +196,7 @@ parameters.  <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-r
 
 adduser postgres (add the user to the system)
 su - postgres
+export PREFIX=/export/home/apps/apache-1.3.26
 
 ./configure --prefix=$PREFIX/postgres-7.1.3 --mandir=$PREFIX/man \
 --with-openssl=$PREFIX/ssl --with-includes=$PREFIX/include --enable-syslog
