@@ -351,3 +351,7 @@ Heed the instructions that it spits out after you run setup
 
 Copy the imap.so shared library to /usr/local/lib, or wherever your
 library files go to...
+
+Another good idea for PHP is to use a ramdisk to store session ID info, this
+will remove the system drives from the equasion, and should really speed things
+up.
