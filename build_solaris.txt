@@ -49,7 +49,7 @@ EAPI_MM=/export/home/build/mm-1.1.3 \
 --enable-module=ssl \
 --enable-module=most \
 --enable-shared=max \
---enable-rule=EAPI \  
+--enable-rule=EAPI \
 --enable-rule=SHARED_CORE \
 --enable-rule=SHARED_CHAIN \
 --enable-module=so
@@ -57,6 +57,80 @@ EAPI_MM=/export/home/build/mm-1.1.3 \
 make
 make certificate TYPE=custom
 sudo make install
+
+Frontpage extensions (http://www.rtr.com/fpsupport/download.htm)
+----------------------------------------------------------------
+Download the Frontpage extensions from RTR.  You can also as an option download
+the Apache module 'mod_frontpage', which provides a suEXEC wrapper to
+Frontpage.  If you do decide to use mod_frontpage, you will be patching Apache
+with the source from that instead of the source that comes with the RTR
+Frontpage package.  BE SURE to make a copy of the 'httpd' binary before you
+start, as Frontpage will be replacing it before it's done installing.  The
+'httpd' binary lives in '/export/home/apache/bin/httpd'.  You will also need a
+'.htaccess' file in the same directory as where you set up the root web. 
+
+Edit the httpd.conf file, and change the following:
+
+AllowOverride All
+DocumentRoot /export/home/webuser/www
+Port 80
+Listen 80
+Listen 443
+User www
+Group webuser
+cgi-bin should be /export/home/webuser/cgi-bin
+
+This is so when you run the FrontPage installer, it will install, as it's
+scripting is brain-dead.  During the install process, you will be replacing
+your Apache binary with the FrontPage provided binary; this is only temporary,
+as you will be compiling an Apache binary from scratch with FrontPage as an
+Apache module.
+
+Un-gzip or uncompress the Frontpage package before you begin.
+
+uncompress fp50.solaris.tar.Z
+
+Then untar it to get the fp_install.sh script out:
+
+tar xvf fp50.solaris.tar
+
+Copy the install shell script somewhere:
+
+cp fp_install.sh /tmp
+
+Then retar the Frontpage tarball:
+
+tar cvf fp50.solaris.tar frontpage
+
+#Go into the bin directory, and run:
+
+#./owsadm.exe -o install -u webuser -p 80 -servconf
+#/export/home/apache/conf/httpd.conf -xuser webuser -xgroup webuser
+
+#This will add the files for the root web, and correctly set ownership of the
+#files.
+
+#(Note: FP installer choked on setting up in DocumentRoot, as mine are in
+#virtual hosts, not in the main part of the config file.)
+
+Copy the file 'fp-patch-apache_1.3.19' to the $APACHE/src directory.  Solaris 8
+comes with GNU patch, it's called 'gpatch'.  Solaris patch won't figure out the
+RTR Apache patch.  Recompile Apache, but add a '--add-module=mod_frontpage.c'
+and to the ./configure line.
+
+Compiled-in mod_frontpage ./configure line:
+SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
+--prefix=/export/home/apache --enable-module=ssl --enable-module=most \
+--enable-shared=max --enable-rule=EAPI --enable-rule=SHARED_CORE \
+--enable-rule=SHARED_CHAIN --add-module=mod_frontpage.c --enable-module=so
+
+Shared module mod_frontpage:
+SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
+--prefix=/export/home/apache --enable-module=ssl --enable-module=most \
+--enable-shared=max --enable-rule=EAPI --enable-rule=SHARED_CORE \
+--enable-rule=SHARED_CHAIN --activate-module=src/modules/mod_frontpage.o \
+--enable-shared=frontpage --enable-module=so
+
 
 IMAP (http://www.washington.edu/imap/)
 ----
@@ -222,62 +296,6 @@ ModDAV (http://www.webdav.org/mod_dav/)
 
 make
 make install
-
-Frontpage extensions (http://www.rtr.com/fpsupport/download.htm)
-----------------------------------------------------------------
-Download the Frontpage extensions from RTR.  You can also as an option download
-the Apache module 'mod_frontpage', which provides a suEXEC wrapper to
-Frontpage.  If you do decide to use mod_frontpage, you will be patching Apache
-with the source from that instead of the source that comes with the RTR
-Frontpage package.  BE SURE to make a copy of the 'httpd' binary before you
-start, as Frontpage will be replacing it before it's done installing.  The
-'httpd' binary lives in '/export/home/apache/bin/httpd'.  You will also need a
-'.htaccess' file in the same directory as where you set up the root web. 
-
-Un-gzip or uncompress the Frontpage package before you begin.
-
-uncompress fp50.solaris.tar.Z
-
-Then untar it to get the fp_install.sh script out:
-
-tar xvf fp50.solaris.tar
-
-Copy the install shell script somewhere:
-
-cp fp_install.sh /tmp
-
-Then retar the Frontpage tarball:
-
-tar cvf fp50.solaris.tar frontpage
-
-Run fp_install.sh:
-
-/tmp/fp_install.sh
-
-Say 'Y' when you are prompted if you have a good backup of your Apache source.
-Then use '/export/home/apache/frontpage/' as your install directory.
-
-The script will look for the fp50.solaris.tar file, and chances are it won't
-find it.  You'll have to give it an absolute path to where it is hidden.
-
-Script will then look for a previous installation of the FP extensions.  If it
-finds any, it will migrate them to the latest and greatest.  Then it will
-prompt you for the location of the current Apache httpd binary.  On our
-systems, it lives in '/export/home/apache/bin/httpd'.  Say 'Y' to have
-Frontpage replace your binary with it's own.  Once it's done replacing your
-httpd binary, it will prompt you if you want to interactively chown the
-Frontpage webs on the server.  Say 'Y', then tell it what character set and
-language to use.  Any prompts in brackets (like this '[1]') are the defaults
-for that prompt.  Answer 'Y' when prompted to install a root web.  You will
-then be prompted for the location of the Apache server config file, and the
-name of the Frontpage admin.  The config file name is
-'/export/home/apache/conf/httpd.conf' and the server admin is 'webuser'.  You
-will then be shown the user and group the server is running as, just accept the
-defaults.
-
-(Note: FP installer choked on setting up in DocumentRoot, as mine are in
-virtual hosts, not in the main part of the config file.)
-
 
 
 ================================================================
