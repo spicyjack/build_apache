@@ -128,6 +128,26 @@ gobbledeygook, then you need to 'AddLanguage en-US .us' in the httpd.conf file
 in Apache.  Same goes with en-UK and en-AU as well. Also you need to add
 en-US as the first language in the LanguagePriority section.
 
+---
+Fun with SSL ciphers:
+---
+Want to use only decent encryption with your SSL virtual host?  Try this line
+for SSLCipherSuite today!
+
+SSLCipherSuite ALL:-EXP:-eNULL:-aNULL
+
+ALL: use all encryption ciphers and authenication mechanisims
+-EXP: except for encryption ciphers that are export grade (less than 40 bits in
+length)
+-DES: except for the DES encryption cipher, is moderately easy to break.  Note
+that 3DES and DES are two different animals, 3DES is still considered 'secure'.
+-eNULL: except for null encryption ciphers
+-aNULL: except for null authentication mechanisims
+
+To test the above, use the following with openssl:
+
+openssl ciphers -v 'ALL:-EXP:-DES:-eNULL:-aNULL'
+
 ===========================
 Shared memory file storage:
 ===========================
@@ -151,6 +171,7 @@ apachetmp   /var/lib/apache tmpfs size=8M
 
 See also the mod_ssl entry on EAPI above
 
+----
 IMAP (http://www.washington.edu/imap/)
 ----
 make slx
