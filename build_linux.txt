@@ -55,6 +55,11 @@ make
 make certificate TYPE=custom
 sudo make install
 
+Note: Mozilla's default character encoding type is 'en-US', which apache knows
+nothing about.  So if you don't want Mozilla to come up with pages of
+gobbledeygook, then you need to 'AddLanguage en-US .us' in the httpd.conf file
+in Apache.  Same goes with en-UK and en-AU as well.
+
 Frontpage extensions (http://www.rtr.com/fpsupport/download.htm)
 ----------------------------------------------------------------
 Download the Frontpage extensions from RTR.
