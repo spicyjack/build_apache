@@ -384,3 +384,65 @@ Enter the new value, or press return for the default
         Other []: 
 Is the information correct? [y/n] y
 
+
+Generating SSL certificates
+===========================
+For the initial SSL cert generation, you can use 'make certificate type=CUSTOM'
+inside of Apache.  This will generate both the custom Certificate Authority
+(CA) certificate (ca.crt) , and the server's certificate (server.crt).  Once
+you have a CA certificate, you can sign more certificates.  There's a shell
+script inside of mod_ssl called 'sign.sh' that will do the work for you.
+Here's how you use it:
+
+# Create a RSA private key for your Apache server (will be Triple-DES
+# encrypted and PEM formatted):
+
+$ openssl genrsa -des3 -out server.key 1024
+
+# You can see the details of this RSA private key via the command:
+
+$ openssl rsa -noout -text -in server.key
+
+# And you could create a decrypted PEM version (not recommended) of this RSA
+# private key via:
+
+$ openssl rsa -in server.key -out server.key.unsecure
+
+# Create a Certificate Signing Request (CSR) with the server RSA private key
+# (output will be PEM formatted):
+
+$ openssl req -new -key server.key -out server.csr
+
+# You can see the details of this CSR via the command
+
+$ openssl req -noout -text -in server.csr
+
+# sign the CSR with sign.sh
+
+$ sign.sh server.csr
+
+# View the signed certificate
+
+openssl x509 -noout -text -in server.crt
+
+Creating a CA certificate
+=========================
+# Create a RSA private key for your CA (will be Triple-DES encrypted and
+# PEM formatted):
+
+$ openssl genrsa -des3 -out ca.key 1024
+
+# You can see the details of this RSA private key via the command
+
+$ openssl rsa -noout -text -in ca.key
+
+# And you can create a decrypted PEM version (not recommended) of this private
+# key via:
+
+$ openssl rsa -in ca.key -out ca.key.unsecure
+
+# Create a self-signed CA Certificate (X509 structure) with the RSA key of the 
+# CA (output will be PEM formatted):
+
+$ openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+
