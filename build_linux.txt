@@ -502,6 +502,10 @@ $ sign.sh server.csr
 
 openssl x509 -noout -text -in server.crt
 
+# create a PEM version for IIS
+
+openssl x509 -in server.crt -out server.crt.pem -outform PEM
+
 Creating a CA certificate
 =========================
 # Create a RSA private key for your CA (will be Triple-DES encrypted and
