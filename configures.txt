@@ -1,0 +1,14 @@
+PHP 4.02
+--------
+[observer][php-4.0.2 534] ./configure \
+> --with-apxs=/usr/local/apache/bin/apxs \
+> --with-config-file-path=/usr/local/apache/conf \
+> --with-gd \
+> --with-imap=/usr/local/src/apache/imap \
+> --with-ldap=/usr/lib \
+> --with-mysql \
+> --with-mm=/usr/local/lib \ 
+> --with-zlib=/usr/lib \
+> --enable-track-vars
+
+
