@@ -43,7 +43,7 @@ Is the information correct? [y/n] y
 
 MM (http://www.engelschall.com/sw/mm/#tarballs)
 -----------------------------------------------
-./configure --prefix=$PREFIX
+./configure --prefix=$PREFIX --disable-static
 #./configure (problems with apache finding libmm in the apache runtime tree?)
 make
 sudo make install
@@ -242,4 +242,37 @@ That ought to do it.  I recommend doing a search on your filesystem for
 other, older copies of libssl* and libcrypto* that might be hanging
 around, as sometimes copies get put in strange places and you want to be
 sure to only have one: the most recent.
+
+Python (for moinmoin wiki)
+--------------------------
+./configure --disable-static --prefix=/usr/local/apache-2.0.52/python-2.3.4
+--with-threads --with-doc-strings
+
+FastCGI (for Python)
+--------------------
+cp Makefile.AP2 Makefile
+vi Makefile (set 'topsrc' to be the current apache install directory)
+make
+sudo make install
+ 
+MoinMoin Wiki
+-------------
+export MOINBASE=/usr/local/apache-2.0.52/python/
+
+$MOINBASE/bin/python setup.py --quiet install
+--prefix=$MOINBASE --record=install.log
+
+cd $MOINBASE
+export WIKI_INSTANCE=[antlinux|tennsat|quickmap]
+mkdir $WIKI_INSTANCE
+cp -r data/ $WIKI_INSTANCE
+cp -r underlay/ $WIKI_INSTANCE
+cp config/wikiconfig.py $WIKI_INSTANCE
+chown -R httpd.httpd $WIKI_INSTANCE
+chmod -R ug+rwX $WIKI_INSTANCE
+chmod -R o-rwx $WIKI_INSTANCE
+cp server/moin.py $WIKI_INSTANCE 
+(only for running standalone server; see
+http://moinmoin.wikiwikiweb.de/MoinMoin/InstallDocs#basic-install for more
+info)
 
