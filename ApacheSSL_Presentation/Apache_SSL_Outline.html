@@ -14,26 +14,61 @@
   <li>mod_ssl documentation ( <a href="http://www.modssl.org/docs/2.8/">http://www.modssl.org/docs/2.8/</a>,
 also installed locally in the 'htdocs' directory, in Apache's
 ServerRoot)</li>
+  <li>ssltap documentation on Mozilla's website (<a
+ href="http://www.mozilla.org/projects/security/pki/nss/tools/ssltap.html">http://www.mozilla.org/projects/security/pki/nss/tools/ssltap.html</a>)</li>
+  <ul>
+    <li><samp>ssltap -f -s logan5.cerf.net:443 &gt; ssltap.out</samp><br>
+    </li>
+  </ul>
 </ul>
+<h4>Background</h4>
+An SSL certificate is a public key that has been signed by a trusted
+third party. &nbsp;The act of the trusted third party (Certificate
+Authority) signing your public key (SSL certificate) is to give the
+person who is viewing your SSL-protected web site some peace of mind
+that you are who your SSL Certificate is saying you are. &nbsp;You can,
+however, use SSL Certificates without ever dealing with the trusted
+third party; but in that case, it's up to the end user to decide
+whether or not to trust you.<br>
 <h4>Basics</h4>
 <ul>
+  <li>show how to get openssl version</li>
   <li>generate a key</li>
   <li>create an un-password protected key ( optional, for scripted
 restarts )<br>
   </li>
   <li>generate a CSR</li>
   <li>send in the CSR to a CA to get it signed (use Verisign's test
-signature service), and become your own CA and sign your own
-certificates. &nbsp;When signing your own cert, describe how to change
-the signing length, using the openssl.cnf file</li>
+signature service; <a
+ href="http://www.verisign.com/products/srv/trial/step1.html">http://www.verisign.com/products/srv/trial/step1.html</a>
+), and become your own CA and sign your own certificates. &nbsp;When
+signing your own cert, describe how to change the signing length, using
+the openssl.cnf file</li>
   <li>install the key and certificate files in apache by editing the
 httpd.conf file</li>
   <li>check apache by using the configtest target</li>
   <li>restart apache, but enter the password wrong, to show what the
 output looks like</li>
   <li>check apache using ps</li>
-  <li>check things in a browser<br>
-  </li>
+  <li>check things in a browser</li>
+</ul>
+<h4>SSL in Mozilla</h4>
+<ul>
+  <li>Edit -&gt; Preferences</li>
+  <li>Privacy &amp; Security</li>
+  <ul>
+    <li>SSL ( client SSL ciphers can be selected and de-selected here )</li>
+  </ul>
+  <ul>
+    <li>Certificates <br>
+    </li>
+  </ul>
+  <ul>
+    <ul>
+      <li>Web Sites - view all of the non-CA signed SSL certificates<br>
+      </li>
+    </ul>
+  </ul>
 </ul>
 <h4>Chain loading in SSL v3.0</h4>
 From the mod_ssl documentation:<br>
@@ -82,9 +117,9 @@ Now create a CSR.&nbsp; You will be entering in your information when
 creating the CSR. Be sure to have the correct domain name and company
 name!&nbsp; The "Organization Name" should match what is listed with
 your&nbsp; DUNS number, if you have one. If you do have a DUNS number,
-and misspell your Company name in your CSR, Verisign will reject the
-CSR request. The "Common Name" is the URL that will be used for SSL.
-Leave the challenge password and optional company name blank. </p>
+and misspell your Company name in your CSR, Verisign will reject the CSR
+request. The "Common Name" is the URL that will be used for SSL. Leave
+the challenge password and optional company name blank. </p>
 <p><tt>[logan5][root /usr/local/openssl/bin]$ <font color="#3333ff">openssl
 req -new -key kplug.key -out kplug.csr</font></tt> <br>
 <tt><font color="#009900">Using configuration from
@@ -141,8 +176,8 @@ rsa -noout -text -in kplug.csr<br>
 Take this CSR to Verisign and obtain a certificate. When selecting the
 Server Software Vendor, they should choose the "Apache Freeware with
 SSLeay" option. The resulting certificate should look like the CSR, but
-without the "REQUEST" part of the header and footer. &nbsp;Then copy
-the files: </p>
+without the "REQUEST" part of the header and footer. &nbsp;Then copy the
+files: </p>
 <p><tt><font color="#3333ff">cp kplug.key
 /usr/local/apache/conf/ssl.key/kplug.key</font></tt> <br>
 <tt><font color="#3333ff">cp kplug.crt
@@ -205,6 +240,25 @@ directory)<br>
 <br>
 $ sign.sh kplug.csr<br>
 <br>
-<br>
+<h4>Verisign test certificate e-mail</h4>
+<pre><tt>YOUR ORDER NUMBER: 117119290<br><br>Dear VeriSign Customer:<br><br>Congratulations!  Your Trial SSL Server Digital ID, issued to:<br><br>CN:  WWW.TESTCOMPANY.COM<br>O:   TEST COMPANY<br>OU:  TESTERS<br><br>can be installed by following the instructions below.<br><br>Before using your Trial SSL Server ID, install the Test CA <br>Root in each browser you plan to use as part of your test of <br>SSL. <br><br>***********************************************************<br>* To download the Test CA Root, go to:<br><br><a
+ href="http://www.verisign.com/server/trial/faq/index.html"
+ target="_blank">http://www.verisign.com/server/trial/faq/index.html</a><br><br>and follow the instructions there.<br><br><br>* To install your Trial SSL Server ID, go to:<br><br><a
+ href="http://www.verisign.com/support/install/index.html#trial"
+ target="_blank">http://www.verisign.com/support/install/index.html#trial</a> <br><br>and follow the instructions there.<br><br>***********************************************************<br><br>After testing your Trial SSL Server ID, you will need to purchase <br>a full service Server ID, available as part of VeriSign's trust <br>solutions.  Follow these easy steps to continue benefiting from <br>VeriSign SSL Server IDs: <br><br>* Step 1 - Visit:  <a
+ href="http://www.verisign.com/products/site/" target="_blank">http://www.verisign.com/products/site/</a><br><br>Here you can familiarize yourself with the full range <br>of available VeriSign Secure Site services, with packages <br>including:<br><br>- VeriSign Secure Site Pro and Commerce Site Pro <br>solutions with Global IDs that enable 128-bit <br>SSL encryption--the world's strongest--with all <br>Microsoft and Netscape browsers.<br><br>- VeriSign Commerce Site and Commerce Site Pro ID's <br>bundled with VeriSign's payment processing solution, <br>Payflow Pro.  These e-commerce solutions are available at:<br><a
+ href="http://www.verisign.com/products/site/commerce/" target="_blank">http://www.verisign.com/products/site/commerce/</a><br><br>- Additional VeriSign e-commerce services, such as the <br>widely-recognized Secure Site Seal to post on your site <br>as a symbol of trust.  VeriSign also offers up to $250,000 <br>of NetSure protection and Network Security auditing by Qualys.  <br>Learn more about all of VeriSign's trust solutions at:<br><a
+ href="http://www.verisign.com/products/site/" target="_blank">http://www.verisign.com/products/site/</a><br><br><br>* Step 2 - Order VeriSign SSL Server IDs at: <br><br><a
+ href="http://www.verisign.com/products/site/secure" target="_blank">http://www.verisign.com/products/site/secure</a><br><br>***********************************************************<br><br>It's that easy!  If you have any questions about installing or using <br>your<br>Trial SSL Server ID, please contact us at 650-426-3400.<br><br>Thank you for your interest in VeriSign products!<br><br><br>Customer Support Department <br>VeriSign, Inc.<br>The Value of Trust (sm)<br><br>E-mail: <a
+ href="http://us.f123.mail.yahoo.com/ym/Compose?To=support@verisign.com&amp;YY=22534&amp;order=down&amp;sort=date&amp;pos=0&amp;view=a&amp;head=b">support@verisign.com</a><br>Web: <a
+ href="http://www.verisign.com" target="_blank">http://www.verisign.com</a>           <br>For sales call (650)426-5112<br>Fax: (650)961-8870<br><br><br>P.S. During testing of your VeriSign Trial SSL ID, you can receive <br>additional technical information by downloading our new white paper <br>on implementing SSL and payment processing solutions at: <br><a
+ href="http://www.verisign.com/rsc/gd/pmt/ecomm-tech/" target="_blank">http://www.verisign.com/rsc/gd/pmt/ecomm-tech/</a><br><br><br><br>-----BEGIN CERTIFICATE-----<br>MIIDPDCCAuagAwIBAgIQe7urYs00sDHxrKwg3XobmzANBgkqhkiG9w0BAQUFADCB<br>qTEWMBQGA1UEChMNVmVyaVNpZ24sIEluYzFHMEUGA1UECxM+d3d3LnZlcmlzaWdu<br>LmNvbS9yZXBvc2l0b3J5L1Rlc3RDUFMgSW5jb3JwLiBCeSBSZWYuIExpYWIuIExU<br>RC4xRjBEBgNVBAsTPUZvciBWZXJpU2lnbiBhdXRob3JpemVkIHRlc3Rpbmcgb25s<br>eS4gTm8gYXNzdXJhbmNlcyAoQylWUzE5OTcwHhcNMDIxMjExMDAwMDAwWhcNMDIx<br>MjI1MjM1OTU5WjB8MQswCQYDVQQGEwJVUzEQMA4GA1UECBMHQWxhYmFtYTEUMBIG<br>A1UEBxQLV2lkZ2V0dmlsbGUxFTATBgNVBAoUDFRlc3QgQ29tcGFueTEQMA4GA1UE<br>CxQHVGVzdGVyczEcMBoGA1UEAxQTd3d3LnRlc3Rjb21wYW55LmNvbTCBnzANBgkq<br>hkiG9w0BAQEFAAOBjQAwgYkCgYEAsg2MYFZDIseRNYChO9LNuJCLv1q8Q5tfovQU<br>RmscZYmr2YT6WfxfM7XVu5n6+vEe7PaCUOPiP2s4SNJlcqGngTeTraTLE5ex75GU<br>cbTOKcXYa9rO7+vZsw+eDS9YPEuWIPqq9xs9ZOciRISDVW0oxdAXfAkUrnTN65Xk<br>YksZCmUCAwEAAaOB0TCBzjAJBgNVHRMEAjAAMAsGA1UdDwQEAwIFoDBCBgNVHR8E<br>OzA5MDegNaAzhjFodHRwOi8vY3JsLnZlcmlzaWduLmNvbS9TZWN1cmVTZXJ2ZXJU<br>ZXN0aW5nQ0EuY3JsMFEGA1UdIARKMEgwRgYKYIZIAYb4RQEHFTA4MDYGCCsGAQUF<br>BwIBFipodHRwOi8vd3d3LnZlcmlzaWduLmNvbS9yZXBvc2l0b3J5L1Rlc3RDUFMw<br>HQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMA0GCSqGSIb3DQEBBQUAA0EA<br>r5V2zbzdzSqmjVh4LI+V1NGkhS187Tu0m+aOQS0qQOxB96/UGBp63kwu8pb7SeOS<br>b02FAaY0vTZWQd7TKhRqNQ==<br>-----END CERTIFICATE-----</tt><br></pre>
+<h4>SSLTap Output</h4>
+<pre>Connected to logan5.cerf.net:443<br>--&gt; [<br><font color="blue">(98 bytes of 93)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 22 (handshake)<br>   version = { 3,1 }<br>   length  = 93 (0x5d)<br>   handshake {<br>      type = 1 (client_hello)<br>      length = 89 (0x000059)<br>         ClientHelloV3 {<br>            client_version = {3, 1}<br>            random = {...}<br>            session ID = {<br>                length = 32<br>                contents = {..}<br>            }<br>            cipher_suites[9] = { <br>                (0x0004) SSL3/RSA/RC4-128/MD5<br>                (0xfeff) SSL3/RSA-FIPS/3DES192EDE-CBC/SHA<br>                (0x000a) SSL3/RSA/3DES192EDE-CBC/SHA<br>                (0xfefe) SSL3/RSA-FIPS/DES56-CBC/SHA<br>                (0x0009) SSL3/RSA/DES56-CBC/SHA<br>                (0x0064) TLS/RSA_EXPORT1024/RC4-56/SHA<br>                (0x0062) TLS/RSA_EXPORT1024/DES56_CBC/SHA<br>                (0x0003) SSL3/RSA/RC4-40/MD5<br>                (0x0006) SSL3/RSA/RC2CBC40/MD5<br><br>               }<br>         }<br>   }<br>}<br></font>]<br>&lt;-- [<br><font
+ color="red">(122 bytes of 74, with 43 left over)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 22 (handshake)<br>   version = { 3,1 }<br>   length  = 74 (0x4a)<br>   handshake {<br>      type = 2 (server_hello)<br>      length = 70 (0x000046)<br>         ServerHello {<br>            server_version = {3, 1}<br>            random = {...}<br>            session ID = {<br>                length = 32<br>                contents = {..}<br>            }<br>            cipher_suite = (0x0004) SSL3/RSA/RC4-128/MD5<br>         }<br>   }<br>}<br>(122 bytes of 1, with 37 left over)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 20 (change_cipher_spec)<br>   version = { 3,1 }<br>   length  = 1 (0x1)<br>}<br>(122 bytes of 32)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 22 (handshake)<br>   version = { 3,1 }<br>   length  = 32 (0x20)<br>            &lt; encrypted &gt;<br>}<br></font>]<br>--&gt; [<br><font
+ color="blue">(634 bytes of 1, with 628 left over)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 20 (change_cipher_spec)<br>   version = { 3,1 }<br>   length  = 1 (0x1)<br>}<br>(634 bytes of 32, with 591 left over)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 22 (handshake)<br>   version = { 3,1 }<br>   length  = 32 (0x20)<br>            &lt; encrypted &gt;<br>}<br>(634 bytes of 586)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 23 (application_data)<br>   version = { 3,1 }<br>   length  = 586 (0x24a)<br>            &lt; encrypted &gt;<br>}<br></font>]<br>&lt;-- [<br><font
+ color="red">(243 bytes of 238)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 23 (application_data)<br>   version = { 3,1 }<br>   length  = 238 (0xee)<br>            &lt; encrypted &gt;<br>}<br><br></font>]<br>--&gt; [<br><font
+ color="blue">(554 bytes of 549)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 23 (application_data)<br>   version = { 3,1 }<br>   length  = 549 (0x225)<br>            &lt; encrypted &gt;<br>}<br></font>]<br>&lt;-- [<br><font
+ color="red">(244 bytes of 239)<br>SSLRecord { [Wed Dec 11 17:15:55 2002]<br>   type    = 23 (application_data)<br>   version = { 3,1 }<br>   length  = 239 (0xef)<br>            &lt; encrypted &gt;<br>}<br></font>]<br><br><br><br></pre>
 </body>
 </html>
