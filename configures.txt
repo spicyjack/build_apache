@@ -61,6 +61,8 @@ PHP 4.02
 --with-mysql \
 --with-mm=/usr/local/lib \ 
 --with-zlib=/usr/lib \
+--with-xml \
+--enable-force-cgi-redirect \
 --enable-track-vars
 
 make
