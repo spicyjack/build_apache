@@ -243,30 +243,39 @@ other, older copies of libssl* and libcrypto* that might be hanging
 around, as sometimes copies get put in strange places and you want to be
 sure to only have one: the most recent.
 
-Python (for moinmoin wiki)
---------------------------
-./configure --disable-static --prefix=/usr/local/apache-2.0.52/python-2.3.4
+Python 2.3.x (http://www.python.org)
+------------------------------------
+./configure --disable-static --prefix=/usr/local/apache-2.0.52/python-2.3.4 \
 --with-threads --with-doc-strings
 
-FastCGI (for Python)
---------------------
-cp Makefile.AP2 Makefile
-vi Makefile (set 'topsrc' to be the current apache install directory)
+mod_python (http://httpd.apache.org/modules/python-download.cgi)
+----------------------------------------------------------------
+Make sure 'python2.2' package is already installed.
+
+./configure --with-apxs=/usr/local/apache-2.0.52/bin/apxs \
+--with-python=/usr/bin/python2.2
+
 make
 sudo make install
- 
-MoinMoin Wiki
--------------
+
+in httpd.conf, add the following:
+
+    AddHandler mod_python .py
+
+probably close to teh PHP handlers
+
+MoinMoin Wiki (http://sourceforge.net/project/showfiles.php?group_id=8482)
+--------------------------------------------------------------------------
 export MOINBASE=/usr/local/apache-2.0.52/python/
 
-$MOINBASE/bin/python setup.py --quiet install
+$MOINBASE/bin/python setup.py --quiet install \
 --prefix=$MOINBASE --record=install.log
 
 cd $MOINBASE
 export WIKI_INSTANCE=[antlinux|tennsat|quickmap]
 mkdir $WIKI_INSTANCE
-cp -r data/ $WIKI_INSTANCE
-cp -r underlay/ $WIKI_INSTANCE
+cp -rv data/ $WIKI_INSTANCE
+cp -rv underlay/ $WIKI_INSTANCE
 cp config/wikiconfig.py $WIKI_INSTANCE
 chown -R httpd.httpd $WIKI_INSTANCE
 chmod -R ug+rwX $WIKI_INSTANCE
