@@ -98,8 +98,11 @@ compile options you can set in Apache, use './configure --help'
 
 
 For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
-modules don't get linked correctly against libgcc.a.  See the below URL's for
-more info and solutions:
+modules don't get linked correctly against libgcc.a.  This is because the
+Apache coders use the GNU ld utility for linking modules, which doesn't come by
+default on the reference system.  You can either link the culprit files by
+hand, or install the GNU binutils and recompile.  See the below URL's for more
+info and solutions:
 
 http://perl.apache.org/docs/1.0/guide/troubleshooting.html#symbol___floatdisf__referenced_symbol_not_found
 http://www.riverside.org/archive/html/new-httpd/2003-01/msg00051.html
@@ -110,7 +113,37 @@ For mod_ssl, chances are Apache won't link to the correct archived library
 the ssl directory)
 
 Adding the Apache runtime users:
---------------------------------
+
 shell> groupadd -g 710 webuser
 shell> useradd -u 110 -g webuser -d /export/home/apache www
+
+PHP 4.3.2 (http://www.php.net/download)
+---------------------------------------
+
+# need oracle client package
+
+./configure --prefix=$PREFIX \
+--with-apxs2=$PREFIX/bin/apxs \
+--with-config-file-path=$PREFIX/conf \
+--with-mysql \
+--with-zlib=/lib \ # need zlib header
+--with-xml \
+--with-openssl=$PREFIX \
+--with-gdbm \ # need gdbm headers
+--with-gettext \
+--enable--sysvsem \
+--enable-sysvshm \
+--enable-force-cgi-redirect \
+--enable-calendar \
+--enable-inline-optimization \
+--enable-trans-sid \
+--enable-track-var
+
+==============================================
+PHPWiki todos
+
+- make admin user name 'tiki' with tiki's password
+- set up a manningb account, move work stuff from personal wiki to work wiki
+- make a list of things that we would want to keep track of for each machine we
+  manage
 
