@@ -159,8 +159,8 @@ anyways, so machine reboots would purge that data from the system
 automatically.
 
 Here's a list of directives that would benefit from a shared memory ramdisk:
-httpd.conf: SSLSessionCache         shm:/var/lib/apache/ssl_cache(512000)
-httpd.conf: SSLMutex  file:/var/lib/apache/ssl_mutex
+ssl.conf: SSLSessionCache         shm:/var/lib/apache/ssl_cache(512000)
+ssl.conf: SSLMutex  file:/var/lib/apache/ssl_mutex
 httpd.conf: ScoreBoardFile /var/lib/apache/httpd.scoreboard
 php.ini: session.save_path = /var/lib/apache
 
