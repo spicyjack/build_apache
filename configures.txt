@@ -1,3 +1,9 @@
+OpenSSL 0.9.6
+-------------
+./config --prefix=/usr/local/lib --openssldir=/usr/local/ssl
+make
+sudo make install
+
 PHP 4.02
 --------
 ./configure \
