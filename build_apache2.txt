@@ -21,7 +21,7 @@ make
 sudo make install
 
 OpenSSL 0.9.7x (http://www.openssl.org/source/)
-----------------------------------------
+-----------------------------------------------
 ./config --prefix=$PREFIX shared
 
 The 'shared' statement will make OpenSSL build shared libraries.  You want
@@ -30,15 +30,15 @@ this (see e-mail thread at the bottom of this file).
 make
 sudo make install
 
-IMAP 2002e
-----------
+IMAP 2002e (ftp://ftp.cac.washington.edu/imap/)
+-----------------------------------------------
 Unpack the IMAP tarball, then edit "src/osdep/unix/Makefile".  At the top of
 that file, there are a bunch of SSL-related compile directives.  Change those
 directives so that they match your SSL installation;
-SSLDIR=/usr/lib/ssl
-SSLCERTS=/etc/ssl/certs
+SSLDIR=/usr/local/apache2
+SSLCERTS=$(SSLDIR)/ssl/certs
 SSLKEYS=$(SSLCERTS)
-SSLINCLUDE=/usr/include/openssl
+SSLINCLUDE=$(SSLDIR)/include
 SSLLIB=$(SSLDIR)/lib
 
 then compile IMAP with:
@@ -105,20 +105,19 @@ compile options you can set in Apache, use './configure --help'
 
 ./configure \
 --prefix=$PREFIX \
---enable-ssl \
 --with-ssl=$PREFIX \
 --enable-auth-dbm \
 --enable-auth-digest \
---enable-example \
+--enable-auth-ldap \
 --enable-dav \
 --enable-dav-fs \
---enable-mem-cache \
---enable-usertrack \
 --enable-info \
---enable-cgi \
---enable-vhost-alias \
+--enable-ldap \
 --enable-rewrite \
---enable-so \
+--enable-proxy \
+--enable-ssl \
+--enable-usertrack \
+--enable-vhost-alias \
 --enable-static-htpasswd \
 --enable-static-ab \
 --enable-mods-shared=all \
@@ -130,6 +129,9 @@ sudo make install
 --with-ssl=$PREFIX doesn't work for some reason.  Check the apache
 source/readme, see if you can figure out how to get Apache to use ssl libs that
 are located in a different place than you expect
+
+# --enable-example \ # for development only
+# --enable-so \ # enabled when --enable-shared-mods is used as well
 
 For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
 modules don't get linked correctly against libgcc.a.  This is because the
@@ -145,6 +147,8 @@ For mod_ssl, chances are Apache won't link to the correct archived library
 (libssl.a), and you'll have to re-link the file to create a new shared library.
 (maybe go back in and rebuild the mod_ssl library with all of the lo files in
 the ssl directory)
+
+See also the OpenSSL thread at the bottom of this file.
 
 Adding the Apache runtime users:
 
