@@ -20,76 +20,15 @@ MM (http://www.engelschall.com/sw/mm/#tarballs)
 make
 sudo make install
 
-OpenSSL (http://www.openssl.org/source/)
+OpenSSL 0.9.7x (http://www.openssl.org/source/)
 ----------------------------------------
-./Configure <machine_type> --prefix=$PREFIX 
+./config --prefix=$PREFIX shared
 
-*OR*
-
-./config --openssldir=$PREFIX/ssl
-
-if you're not sure which one you need, read the docs. The ./config command
-above will install everything into $PREFIX/ssl
+The 'shared' statement will make OpenSSL build shared libraries.  You want
+this (see e-mail thread at the bottom of this file).
 
 make
 sudo make install
-
-To figure out what <machine_type> to use, just run the Configure script with no
-arguments.  You'd want to make sure that you build with shared libraries, if
-your platform supports this.  The 'config' script doesn't always get it right.
-
-For Solaris, you'll need to build OpenSSL as shared libraries instead of static
-libraries.  From the message:
-
-http://www.mail-archive.com/modssl-users@modssl.org/msg15745.html
->> Yes, it's a fairly frequently asked question.  The problem is that
->> you've built a shared mod_ssl against a static OpenSSL (ie, libssl.a
->> and libcrypto.a instead of .so).  That won't work because the way the
->> build system currently works, OpenSSL is linked into httpd, not
->> mod_ssl.  httpd doesn't need the symbols from the OpenSSL libraries, so
->> the static linker throws them away, meaning they're no longer available
->> when mod_ssl is dynamically linked at runtime.
->>
->> Solution: use a shared OpenSSL.
->
-> I was wondering how I use a shared OpenSSL.  I was wondering if you can
-> point me to where I can find steps to do this or show me how.
-
-
-I'm CC:'ing this to the modssl-users list, since I'm sure somebody else
-out there probably has the same question.
-
-It's kind of annoying, because the shared library support in OpenSSL is
-"experimental", which in practice just means that the Makefile is
-non-intuitive.  I just ran through it again to make sure I got all the
-steps right... here's what you do.
-
-I'm going to assume that you have the static version of OpenSSL installed
-in /usr/local/lib in this example... just fix the path to match where
-OpenSSL gets installed on your machine.
-
-So let's say you've installed OpenSSL previously, but it's the static
-version, so you have /usr/local/lib/libssl.a and
-/usr/local/lib/libcrypto.a .  Remove those.
-
-Go back to the OpenSSL source directory and do the following:
-
-./config
-make
-make build-shared
-mv libssl.so* /usr/local/lib
-mv libcrypto.so* /usr/local/lib
-ldconfig
-
-(note: do NOT run make install, or it will remove all your shared
-libraries and install the static ones, and you'll have to start over
-again.  :-)
-
-That ought to do it.  I recommend doing a search on your filesystem for
-other, older copies of libssl* and libcrypto* that might be hanging
-around, as sometimes copies get put in strange places and you want to be
-sure to only have one: the most recent.
-
 
 IMAP 2002e
 ----------
@@ -166,32 +105,31 @@ compile options you can set in Apache, use './configure --help'
 
 ./configure \
 --prefix=$PREFIX \
+--enable-ssl \
+--with-ssl=$PREFIX \
 --enable-auth-dbm \
 --enable-auth-digest \
 --enable-example \
 --enable-dav \
+--enable-dav-fs \
 --enable-mem-cache \
 --enable-usertrack \
---enable-ssl \
+--enable-info \
+--enable-cgi \
+--enable-vhost-alias \
+--enable-rewrite \
+--enable-so \
 --enable-static-htpasswd \
 --enable-static-ab \
 --enable-mods-shared=all \
---with-mpm=worker
+--with-mpm=prefork
 
-#--with-ssl=$PREFIX \
+make
+sudo make install
 
 --with-ssl=$PREFIX doesn't work for some reason.  Check the apache
 source/readme, see if you can figure out how to get Apache to use ssl libs that
 are located in a different place than you expect
-
-
-[observer][httpd-2.0.44 550] ./configure --prefix=$PREFIX \
-> --enable-auth-dbm --enable-file-cache --enable-mem-cache \
-> --enable-dav --enable-info --enable-cgi --enable-dav-fs \
-> --enable-vhost-alias --enable-rewrite --enable-so --with-ssl \
-> --with-mpm=prefork --enable-static-htpasswd --enable-static-ab \
-> --enable-mods-shared=all
-
 
 For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
 modules don't get linked correctly against libgcc.a.  This is because the
@@ -213,12 +151,13 @@ Adding the Apache runtime users:
 shell> groupadd -g 710 webuser
 shell> useradd -u 110 -g webuser -d /export/home/apache www
 
-PHP 4.3.2 (http://www.php.net/download)
+PHP 4.3.x (http://www.php.net/download)
 ---------------------------------------
 
 # need oracle client package
 # need zlib headers
 # need gdbm headers
+# need postresql-dev package, which has header files
 
 ./configure --prefix=$PREFIX \
 --with-apxs2=$PREFIX/bin/apxs \
@@ -227,8 +166,8 @@ PHP 4.3.2 (http://www.php.net/download)
 --with-pgsql \
 --with-zlib-dir=/lib \
 --with-xml \
---with-openssl=$PREFIX/ssl \
---with-imap=/usr/local/src/apache/imap \
+--with-pear \
+--with-openssl=$PREFIX \
 --with-gdbm \
 --with-gettext \
 --enable--sysvsem \
@@ -237,5 +176,65 @@ PHP 4.3.2 (http://www.php.net/download)
 --enable-calendar \
 --enable-inline-optimization \
 --enable-trans-sid \
---enable-track-var
+--enable-track-var \
+--with-gd \
+--with-imap=/usr/local/src/apache/imap
+
+make
+sudo make install
+
+OpenSSL Shared Libraries
+------------------------
+For Solaris, you'll need to build OpenSSL as shared libraries instead of static
+libraries.  From the message:
+
+http://www.mail-archive.com/modssl-users@modssl.org/msg15745.html
+
+>> Yes, it's a fairly frequently asked question.  The problem is that
+>> you've built a shared mod_ssl against a static OpenSSL (ie, libssl.a
+>> and libcrypto.a instead of .so).  That won't work because the way the
+>> build system currently works, OpenSSL is linked into httpd, not
+>> mod_ssl.  httpd doesn't need the symbols from the OpenSSL libraries, so
+>> the static linker throws them away, meaning they're no longer available
+>> when mod_ssl is dynamically linked at runtime.
+>>
+>> Solution: use a shared OpenSSL.
+>
+> I was wondering how I use a shared OpenSSL.  I was wondering if you can
+> point me to where I can find steps to do this or show me how.
+
+
+I'm CC:'ing this to the modssl-users list, since I'm sure somebody else
+out there probably has the same question.
+
+It's kind of annoying, because the shared library support in OpenSSL is
+"experimental", which in practice just means that the Makefile is
+non-intuitive.  I just ran through it again to make sure I got all the
+steps right... here's what you do.
+
+I'm going to assume that you have the static version of OpenSSL installed
+in /usr/local/lib in this example... just fix the path to match where
+OpenSSL gets installed on your machine.
+
+So let's say you've installed OpenSSL previously, but it's the static
+version, so you have /usr/local/lib/libssl.a and
+/usr/local/lib/libcrypto.a .  Remove those.
+
+Go back to the OpenSSL source directory and do the following:
+
+./config
+make
+make build-shared
+mv libssl.so* /usr/local/lib
+mv libcrypto.so* /usr/local/lib
+ldconfig
+
+(note: do NOT run make install, or it will remove all your shared
+libraries and install the static ones, and you'll have to start over
+again.  :-)
+
+That ought to do it.  I recommend doing a search on your filesystem for
+other, older copies of libssl* and libcrypto* that might be hanging
+around, as sometimes copies get put in strange places and you want to be
+sure to only have one: the most recent.
 

@@ -577,5 +577,3 @@ $ openssl rsa -in ca.key -out ca.key.unsecure
 
 $ openssl req -new -x509 -days 365 -key ca.key -out ca.crt
 
-
-
