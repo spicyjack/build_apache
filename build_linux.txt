@@ -1,5 +1,9 @@
-Building Apache, by Brian Manning - Last updated 13Aug2003
+Building Apache, by Brian Manning - Last updated 14Nov2003
 
+14Nov2003
+-- added section on using tmpfs shared memory ramdisk for file storage
+
+13Aug2003
 -- updated to Apache 1.3.28
 -- updated to PHP 4.2.3
 -- updated to MM 1.3.0
@@ -77,6 +81,13 @@ sudo make install
 
 mod_ssl (http://www.modssl.org/source/)
 ---------------------------------------
+See https://bugzilla.redhat.com/bugzilla/long_list.cgi?buglist=61030 for a
+description on how to move the location of the shared memory semaphore file
+'httpd.mm.$PID.sem'
+
+See also http://www.modssl.org/docs/2.8/ssl_faq.html#ToC14 for the reason why
+there's no shared memory file (httpd.mm.$PID.sem) configuration directive.
+
 ./configure \
 --with-apache=../apache \
 --with-ssl=$PREFIX \
@@ -117,76 +128,28 @@ gobbledeygook, then you need to 'AddLanguage en-US .us' in the httpd.conf file
 in Apache.  Same goes with en-UK and en-AU as well. Also you need to add
 en-US as the first language in the LanguagePriority section.
 
-Frontpage extensions (http://www.rtr.com/fpsupport/download.htm)
-----------------------------------------------------------------
-Download the Frontpage extensions from RTR.
+===========================
+Shared memory file storage:
+===========================
+If you have the Linux shared memory driver turned on (it's called tmpfs), you
+can set up an area in the filesystem for storing temporary files.  Storing
+things like PHP session data, and various Apache semaphores on a memory-based
+disk system would speed things up a wee bit, plus, you don't need that crap
+anyways, so machine reboots would purge that data from the system
+automatically.
 
-Edit the httpd.conf file, and change the following:
+Here's a list of directives that would benefit from a shared memory ramdisk:
+httpd.conf: SSLSessionCache         shm:/var/lib/apache/ssl_cache(512000)
+httpd.conf: SSLMutex  file:/var/lib/apache/ssl_mutex
+httpd.conf: ScoreBoardFile /var/lib/apache/httpd.scoreboard
+php.ini: session.save_path = /var/lib/apache
 
-AllowOverride All
-DocumentRoot /export/home/webuser/www
-Port 80
-Listen 80
-Listen 443
-User www
-Group webuser
-cgi-bin should be /export/home/webuser/cgi-bin
+Here's a sample entry from a Linux /etc/fstab file, which describes how the
+tmpfs filesystem gets created at boottime:
 
-This is so when you run the FrontPage installer, it will install, as it's
-scripting is brain-dead.  During the install process, you will be replacing
-your Apache binary with the FrontPage provided binary; this is only temporary,
-as you will be compiling an Apache binary from scratch with FrontPage as an
-Apache module.
+apachetmp   /var/lib/apache tmpfs size=8M
 
-Un-gzip or uncompress the Frontpage package before you begin.
-
-uncompress fp50.solaris.tar.Z
-
-Then untar it to get the fp_install.sh script out:
-
-tar xvf fp50.solaris.tar
-
-Copy the install shell script somewhere:
-
-cp fp_install.sh /tmp
-
-Then retar the Frontpage tarball:
-
-tar cvf fp50.solaris.tar frontpage
-
-#Go into the bin directory, and run:
-
-#./owsadm.exe -o install -u webuser -p 80 -servconf
-#/export/home/apache/conf/httpd.conf -xuser webuser -xgroup webuser
-
-#This will add the files for the root web, and correctly set ownership of the
-#files.
-
-#(Note: FP installer choked on setting up in DocumentRoot, as mine are in
-#virtual hosts, not in the main part of the config file.)
-
-Copy the file 'fp-patch-apache_1.3.19' to the $APACHE/src directory.  Solaris 8
-comes with GNU patch, it's called 'gpatch'.  Solaris patch won't figure out the
-RTR Apache patch.  Recompile Apache, but add a '--add-module=mod_frontpage.c'
-and to the ./configure line.
-
-Patch command goes like:
-
-patch -p0 < fp-patch-apache_1.3.19
-
-Compiled-in mod_frontpage ./configure line:
-SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
---prefix=/export/home/apache --enable-module=ssl --enable-module=most \
---enable-shared=max --enable-rule=EAPI --enable-rule=SHARED_CORE \
---enable-rule=SHARED_CHAIN --add-module=mod_frontpage.c --enable-module=so
-
-Shared module mod_frontpage:
-SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
---prefix=/export/home/apache --enable-module=ssl --enable-module=most \
---enable-shared=max --enable-rule=EAPI --enable-rule=SHARED_CORE \
---enable-rule=SHARED_CHAIN --activate-module=src/modules/mod_frontpage.o \
---enable-shared=frontpage --enable-module=so
-
+See also the mod_ssl entry on EAPI above
 
 IMAP (http://www.washington.edu/imap/)
 ----
