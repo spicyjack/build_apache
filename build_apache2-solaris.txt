@@ -18,19 +18,17 @@ parameters.  <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-r
 esources.html#SYSVIPC> will give you more dirt.
 
 adduser postgres (add the user to the system)
-export PREFIX=/export/home/postgres
 
-./configure --prefix=$PREFIX --with-openssl=/usr/local/ssl \
+./configure --prefix=/export/home/postgres --with-openssl=/usr/local/ssl \
 --with-includes=/usr/local/includes 
 
 make
 make install
 
 adduser postgres (add the user to the system)
-chown postgres $PREFIX/data
+chown postgres /export/home/postgres/data
 su - postgres
-export PREFIX=/export/home/postgres
-$PREFIX/bin/initdb -D $PREFIX/data
+/export/home/postgres/bin/initdb -D /export/home/postgres/data
 
 MySQL 3.23.xx (http://www.mysql.com/downloads/)
 -----------------------------------------------
@@ -45,20 +43,34 @@ CXXFLAGS="-O3 -fno-omit-frame-pointer -felide-constructors -fno-exceptions \
 --enable-local-infile --enable-assembler --with-named-z-libs=no\
 --with-named-curses-libs=-lcurses --disable-shared 
 
+make
+make install
+
 Apache 2.0.xx
 -------------
 unpack the tarball, cd into the source directory.  To get a full listing of
 compile options you can set in Apache, use './configure --help'
 
-./configure \
+./configure \ 
 --prefix=$PREFIX \
 --enable-auth-dbm \
 --enable-example \
 --enable-usertrack \
 --enable-ssl \
---with-ssl=/usr/local/ssl \
+--with-ssl=$PREFIX \
 --enable-static-htpasswd \
 --enable-static-ab \
 --enable-mods-shared=all \
 --with-mpm=worker
 
+For Apache 2.0.44 on Solaris, if you compile using GCC, some of the Apache
+modules don't get linked correctly against libgcc.a.  See the below URL's for
+more info and solutions:
+
+http://perl.apache.org/docs/1.0/guide/troubleshooting.html#symbol___floatdisf__referenced_symbol_not_found
+http://www.riverside.org/archive/html/new-httpd/2003-01/msg00051.html
+
+For mod_ssl, chances are Apache won't link to the correct archived library
+(libssl.a), and you'll have to re-link the file to create a new shared library.
+(maybe go back in and rebuild the mod_ssl library with all of the lo files in
+the ssl directory)
