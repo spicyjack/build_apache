@@ -464,9 +464,39 @@ Heed the instructions that it spits out after you run setup
 Copy the imap.so shared library to /usr/local/lib, or wherever your
 library files go to...
 
+PHP Session Variables and RAMDISK
+---------------------------------
 Another good idea for PHP is to use a ramdisk to store session ID info, this
 will remove the system drives from the equasion, and should really speed things
 up.
+
+To set up a ramdisk, your Linux kernel needs to have 'tmpfs' compiled; when you
+issue the command 'cat /proc/filesystems | grep tmpfs', you should see
+something output that has the word 'tmpfs' in it.  If you don't see any output,
+you're not using tmpfs.  Once you have tmpfs 'installed', to use it, you just
+issue the 'mount' command, and the kernel will build the filesystem in memory
+right then.  For example, assuming you have a subdirectory called 'test' in the
+current directory, you can create a tmpfs filesystem by issuing the following
+command:
+
+mount -t tmpfs -o size=4m testtmpfs test/
+
+To make it more permanent, just add it to your system's /etc/fstab:
+
+apachetmp   /var/lib/apache tmpfs size=8M                   0   0
+
+This will create a filesystem called 'apachetmp' at /var/lib/apache, and it
+will be 8 megabytes in size.  You could probably go much lower than this if you
+have a infrequently visited site, or may need more if you get lots of traffic.
+To get PHP to use 'apachetmp' as the place where it stores session files, open
+up the php.ini file on your system, and make the following change:
+
+; Argument passed to save_handler.  In the case of files, this is the path
+; where data files are stored.
+session.save_path = /var/lib/apache
+
+Restart Apache with the new setup, and hit a PHP page that uses sessions, and
+you should now see files in your tmpfs filesystem.
 
 Adding the new user/group for Apache to run as
 ==============================================
