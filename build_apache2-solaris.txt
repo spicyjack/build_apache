@@ -15,9 +15,13 @@ best remove them or they may get stomped.
 
 OpenSSL (http://www.openssl.org/source/)
 ----------------------------------------
-./config --prefix=$PREFIX
+./Configure <machine_type> --prefix=$PREFIX
 make
 sudo make install
+
+To figure out what <machine_type> to use, just run the Configure script with no
+arguments.  You'd want to make sure that you build with shared libraries, if
+your platform supports this.  The 'config' script doesn't always get it right.
 
 PostgreSQL 7.3.x (http://www.postgresql.org/mirrors-ftp.html)
 ----------------
