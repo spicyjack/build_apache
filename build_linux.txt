@@ -1,16 +1,18 @@
-Building Apache, by Brian Manning - Last updated October 10th, 2002
+Building Apache, by Brian Manning - Last updated 07Aug2003
+
+10Oct2002
 -- updated to Apache 1.3.27
 -- updated to PHP 4.2.1
 -- updated to MM 1.2.1
 -- added Oracle support to PHP
 
-June 20th, 2002
+20Jun2002
 -- updated to Apache 1.3.26
 -- updated to PHP 4.2.1
 -- moved Apache conf directory out of the Apache install prefix tree, and moved
 the PHP  .ini file to the new Apache config location as well
 
-additions by Bob Hucik October 14th, 2001
+additions by Bob Hucik 14Oct2001
     --updated to Apache 1.3.22
     --added LanguagePrirority to Mozilla character encoding
     --added my version of PHP install/configure
@@ -41,7 +43,18 @@ directories, with symlink shortcuts.
 Set up the install environment
 ------------------------------
 For the bash shell users:
-export PREFIX=/usr/local/apache-1.3.27
+export PREFIX=/usr/local/apache-1.3.28
+
+Apache (1st Time - http://httpd.apache.org/dist/httpd/)
+-------------------------------------------------------
+# We do a basic configure and install of Apache first, so we have a place to
+# install OpenSSL/libmm; that way, each apache install is self-contained, and
+# can be removed without harming the rest of the system
+./configure \
+--prefix=$PREFIX \
+--enable-module=most \
+--enable-shared=max \
+--enable-module=so
 
 OpenSSL (http://www.openssl.org/source/)
 ----------------------------------------
@@ -51,7 +64,7 @@ sudo make install
 
 MM (http://www.engelschall.com/sw/mm/#tarballs)
 -----------------------------------------------
-./configure
+./configure --prefix=$PREFIX
 make
 sudo make install
 
@@ -59,7 +72,7 @@ mod_ssl (http://www.modssl.org/source/)
 ---------------------------------------
 ./configure \
 --with-apache=../apache \
---with-ssl=SYSTEM \
+--with-ssl=$PREFIX \
 --enable-shared=ssl
 
 Upgrades to mod_ssl
@@ -75,8 +88,8 @@ make distclean
 
 Apache (http://httpd.apache.org/dist/httpd/)
 --------------------------------------------
-SSL_BASE=SYSTEM \
-EAPI_MM=/usr/local/src/apache/mm \
+SSL_BASE=$PREFIX \
+EAPI_MM=../mm \
 ./configure \
 --prefix=$PREFIX \
 --enable-module=ssl \
