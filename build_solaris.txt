@@ -246,6 +246,7 @@ dependencies that PHP requires before it will build)
 --enable-force-cgi-redirect \
 --enable-calendar \
 --enable-inline-optimization \
+--enable-trans-sid \
 --enable-track-vars
 
 make
