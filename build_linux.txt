@@ -8,38 +8,48 @@ document.
 
 
 OpenSSL (http://www.openssl.org/source/)
--------------
+----------------------------------------
 ./config --prefix=/usr/local --openssldir=/usr/local
 make
 sudo make install
 
+# Note, the Solaris 8 refsystem here already has Openssl installed in
+# /usr/local/openssl.  Overwrite it at your peril.
+
 MM (http://www.engelschall.com/sw/mm/#tarballs)
---------
-./configure --disable-shared
+-----------------------------------------------
+./configure
 make
 sudo make install
 
 mod_ssl (http://www.modssl.org/source/)
-------------------------------
+---------------------------------------
 ./configure \
---with-apache=/usr/local/src/apache/apache_1.3.12 \
---with-ssl=/usr/local/ssl \
+--with-apache=/export/home/build/apache_1.3.20 \
+--with-ssl=/usr/local/openssl \
 --enable-shared=ssl
+
+Upgrades to mod_ssl
+-------------------
+./configure \
+--with-apxs=/export/home/apache \
+--with-ssl=/usr/local \
+--with-mm=/usr/local
 
 make
 sudo make install
 make distclean
 
 Apache (http://httpd.apache.org/dist/httpd/)
--------------
-SSL_BASE=/usr/local \
-EAPI_MM=/usr/local/src/apache/mm-1.1.3 \
+--------------------------------------------
+SSL_BASE=/usr/local/openssl \
+EAPI_MM=/export/home/build/mm-1.1.3 \
 ./configure \
---prefix=/usr/local/apache \
+--prefix=/export/home/apache \
 --enable-module=ssl \
 --enable-module=most \
 --enable-shared=max \
---enable-rule=EAPI \  ( ??? Check this one )
+--enable-rule=EAPI \
 --enable-rule=SHARED_CORE \
 --enable-rule=SHARED_CHAIN \
 --enable-module=so
@@ -48,34 +58,198 @@ make
 make certificate TYPE=custom
 sudo make install
 
+Frontpage extensions (http://www.rtr.com/fpsupport/download.htm)
+----------------------------------------------------------------
+Download the Frontpage extensions from RTR.  You can also as an option download
+the Apache module 'mod_frontpage', which provides a suEXEC wrapper to
+Frontpage.  If you do decide to use mod_frontpage, you will be patching Apache
+with the source from that instead of the source that comes with the RTR
+Frontpage package.  BE SURE to make a copy of the 'httpd' binary before you
+start, as Frontpage will be replacing it before it's done installing.  The
+'httpd' binary lives in '/export/home/apache/bin/httpd'.  You will also need a
+'.htaccess' file in the same directory as where you set up the root web. 
+
+Edit the httpd.conf file, and change the following:
+
+AllowOverride All
+DocumentRoot /export/home/webuser/www
+Port 80
+Listen 80
+Listen 443
+User www
+Group webuser
+cgi-bin should be /export/home/webuser/cgi-bin
+
+This is so when you run the FrontPage installer, it will install, as it's
+scripting is brain-dead.  During the install process, you will be replacing
+your Apache binary with the FrontPage provided binary; this is only temporary,
+as you will be compiling an Apache binary from scratch with FrontPage as an
+Apache module.
+
+Un-gzip or uncompress the Frontpage package before you begin.
+
+uncompress fp50.solaris.tar.Z
+
+Then untar it to get the fp_install.sh script out:
+
+tar xvf fp50.solaris.tar
+
+Copy the install shell script somewhere:
+
+cp fp_install.sh /tmp
+
+Then retar the Frontpage tarball:
+
+tar cvf fp50.solaris.tar frontpage
+
+#Go into the bin directory, and run:
+
+#./owsadm.exe -o install -u webuser -p 80 -servconf
+#/export/home/apache/conf/httpd.conf -xuser webuser -xgroup webuser
+
+#This will add the files for the root web, and correctly set ownership of the
+#files.
+
+#(Note: FP installer choked on setting up in DocumentRoot, as mine are in
+#virtual hosts, not in the main part of the config file.)
+
+Copy the file 'fp-patch-apache_1.3.19' to the $APACHE/src directory.  Solaris 8
+comes with GNU patch, it's called 'gpatch'.  Solaris patch won't figure out the
+RTR Apache patch.  Recompile Apache, but add a '--add-module=mod_frontpage.c'
+and to the ./configure line.
+
+Compiled-in mod_frontpage ./configure line:
+SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
+--prefix=/export/home/apache --enable-module=ssl --enable-module=most \
+--enable-shared=max --enable-rule=EAPI --enable-rule=SHARED_CORE \
+--enable-rule=SHARED_CHAIN --add-module=mod_frontpage.c --enable-module=so
+
+Shared module mod_frontpage:
+SSL_BASE=/export/home/openssl EAPI_MM=/export/home/build/mm-1.1.3 ./configure \
+--prefix=/export/home/apache --enable-module=ssl --enable-module=most \
+--enable-shared=max --enable-rule=EAPI --enable-rule=SHARED_CORE \
+--enable-rule=SHARED_CHAIN --activate-module=src/modules/mod_frontpage.o \
+--enable-shared=frontpage --enable-module=so
+
+
 IMAP (http://www.washington.edu/imap/)
 ----
 make slx
 
-Upgrade the below modules at any time using the
-'apxs' binary that comes with Apache
+MySQL (http://www.mysql.com/downloads/)
+-----
+The compile flags below are optional, but taken from the MySQL page at:
+<http://www.mysql.com/documentation/mysql/bychapter/manual_Installing.html#configure_options>
+
+CC=gcc CFLAGS="-O3" \
+CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti" \
+./configure --prefix=/usr/local/mysql --with-low-memory --enable-assembler
+
+If you have a ultra sparc, you can get 4 % more performance by adding "-mcpu=v8
+-Wa,-xarch=v8plusa" to CFLAGS and CXXFLAGS. 
+
+# So my ./configure is:
+
+[logan5][root /export/home/build/mysql-3.23.38]$ CC=gcc CFLAGS="-O3 -mcpu=v8" \
+CXX=gcc CXXFLAGS="-O3 -felide-constructors -fno-exceptions -fno-rtti -mcpu=v8" \
+./configure --prefix=/export/home/mysql --with-low-memory --enable-assembler
+
+# then:
+
+make 
+make test
+make install
+
+# Change the perms in the mysql directory:
+
+chown -R root /export/home/mysql
+chown -R mysql /export/home/mysql/var
+chgrp -R mysql /export/home/mysql
+
+# cd to your installed directory, in this case /export/home/mysql, then run
+./bin/mysql_install_db
+
+# this sets up MySQL's auth system.
+
+# Log into mysql by using /export/home/mysql/bin/mysql, and enter the following:
+
+mysql> set password for root@localhost = password('password');
+
+-and-
+
+mysql> set password for root@host.com = password('password');
+ 
+Copy the file 'mysql.server' to /etc/init.d as 'mysql', and make a symlink back
+from /etc/rc3.d to the file in /etc/init.d.  Also, to make the daemon run as
+user 'mysql', you'll need to add '--user=mysql' to the start) line in
+/etc/init.d/mysql.
+
+PostgreSQL (http://postgresql.readysetnet.com/sites.html) [mirror]
+----------
+PostgreSQL REQUIRES GNU make.  Also, you may need to reset some of the kernel's memory parameters.  <http://postgresql.readysetnet.com/devel-corner/docs/admin/kernel-resources.html#SYSVIPC> will give you more dirt.
+
+adduser postgres (add the user to the system)
+su - postgres
+
+./configure --prefix=/export/home/postgres \
+--with-openssl=/export/home/openssl --enable-syslog
+make
+make install
+
+# initialize the data directory
+/export/home/postgres/bin/initdb -D /export/home/postgres/data
+
+# this will start the database with logging going to 'logfile'
+# use pg_ctl to start postgres from init scripts
+/export/home/postgres/bin/postmaster \
+-D /export/home/postgres/data >logfile 2>&1 &
+
+# create the test database
+/export/home/postgres/bin/createdb test
+
+# then open it up with the 'psql' command line client
+/export/home/postgres/bin/psql test
+
+If you want to run the regression tests, you can do so by going to the source
+directory and running 'make check' as the user 'postgres'.  Building postgres
+as the user 'postgres' is recommended if you plan to run the regression tests.
+If you build as root, then run the regression tests as 'postgres', the test
+won't be able to write over the files owned by root.
+
+I've created a PostgreSQL start/stop script that should come in handy, it's
+called 'postgres', and it should either live in the same CVS repository as this
+one, or in a repository called 'scripts'.  It will kill a database in both
+normal and immediate modes.
+
 
 PHP (http://www.php.net/downloads.php)
 (See below for more details about this specific build as well as other software
 dependencies that PHP requires before it will build)
 --------
 ./configure \
---with-apxs=/usr/local/apache/bin/apxs \
---with-config-file-path=/usr/local/apache/conf \
+--prefix=/export/home/apache \
+--with-apxs=/export/home/apache/bin/apxs \
+--with-config-file-path=/export/home/apache/conf \
 --with-gd \
---with-imap=/usr/local/src/apache/imap \
---with-ldap=/usr/lib \
---with-mysql \
---with-mm=/usr/local/lib \ 
+--with-mysql=/export/home/mysql \
+--with-pgsql=/export/home/postgres \
+--with-mm=/usr/local/lib \
 --with-zlib=/usr/lib \
 --with-xml \
+--with-openssl=/usr/local/openssl \
+--with-gdbm \
+--with-gettext \
+--enable--sysvsem \
+--enable-sysvshm \
 --enable-force-cgi-redirect \
+--enable-calendar \
+--enable-inline-optimization \
 --enable-track-vars
 
 make
 make install
 
-cp php.ini-dist /usr/local/apache/conf/php.ini
+cp php.ini-dist /export/home/apache/conf/php.ini
 
 Add the following directives to Apache's httpd.conf file:
 	AddType application/x-httpd-php .php
@@ -84,6 +258,20 @@ Add the following directives to Apache's httpd.conf file:
 
 And add the following types to the DirectoryIndex direcive:
 	index.php index.php3
+
+I don't think you need to use '--with-apache[=DIR]' if you do
+'--with-apxs[=FILE]' instead.
+
+Left over config variables
+#--with-imap=/usr/local/src/apache/imap \
+#--with-ldap=/usr/lib \ 
+
+After I built PHP, if I do configtest in Apache, it complains about not seeing
+the libs for MySQL and PostgreSQL.  They're located under /export/home, so
+they're not in the system's library path.  In Solaris, this is set in
+/etc/profile, as LD_LIBRARY_PATH.  Copying libpq.so.?.? and
+libmysqlclient.so.?.? to Apache's libexec directory fixed it's bitching, but
+strangely adding the above paths did not.
 
 mod_perl (http://perl.apache.org/)
 --------
@@ -97,8 +285,8 @@ make install
 
 FastCGI (http://www.fastcgi.com)
 -------
-/usr/local/apache/bin/apxs -o mod_fastcgi.so -c *.c
-sudo /usr/local/apache/bin/apxs -i -a -n fastcgi mod_fastcgi.so 
+/export/home/apache/bin/apxs -o mod_fastcgi.so -c *.c
+sudo /export/home/apache/bin/apxs -i -a -n fastcgi mod_fastcgi.so 
 	
 ModDAV (http://www.webdav.org/mod_dav/)
 ------
@@ -142,10 +330,12 @@ have all of the dependencies that PHP is looking for.
 PHP Extra Module Requirements (Optional)
 ----------------------------------------
 - gd graphics libs > 1.3.3 (both regular and devel packages)
-	-libjpeg
-	-libpng
-	-libungif
-	-libXpm
+(http://www.boutell.com/gd/#getgd)
+	-libjpeg (http://www.ijg.org/)
+	-libpng (http://www.libpng.org/pub/png/libpng.html)
+	-libungif (http://prtr-13.ucsc.edu/~badger/software/libungif/index.shtml)
+	-libXpm (ftp://ftp.x.org/contrib/libraries/)
+    -FreeType (http://freetype.sourceforge.net/download.html#freetype2)
 - UW IMAP (compile from scratch, with notes below)
 - gdbm database (including development package if you are installing from
   packages)
