@@ -1,4 +1,10 @@
-Building Apache, by Brian Manning - Last updated 07Aug2003
+Building Apache, by Brian Manning - Last updated 13Aug2003
+
+-- updated to Apache 1.3.28
+-- updated to PHP 4.2.3
+-- updated to MM 1.3.0
+-- added 1st build of Apache, for creating directories for other software
+-- added instructions for making PHP use tmpfs space
 
 10Oct2002
 -- updated to Apache 1.3.27
