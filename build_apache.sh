@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # script to build apache
 

@@ -4,6 +4,8 @@ By Brian Manning
 Last Updated Sep 28 1999
 
 
+FIXME - Try debugging the script using bash -x
+
 1) unpack all of the tarballs into one directory. make sure that MySQL is
 already installed
 
