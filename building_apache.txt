@@ -1,0 +1,141 @@
+THE MONSTER YOU DREAD!!!
+building apache + mod_perl + mod_ssl + mod_php
+By Brian Manning
+Last Updated Sep 28 1999
+
+
+1) unpack all of the tarballs into one directory. make sure that MySQL is
+already installed
+
+2) go into the individual directories, and run the configures/makes for all of
+the pieces parts:
+
+3) watch those bash shell tab completions.  If it adds an extra forward slash
+to the end of a directory name, you can bet it will fuck up the make scripts.
+
+
+Assumptions:
+============
+You want to install Apache and all of it's junk in the /usr/local tree.  If
+that is false, change everything below that says --prefix=/usr/local to
+something you like instead.
+
+
+apache (1st time)
+=================
+# Don't worry about specific options yet
+./configure --prefix=/usr/local
+
+mm (memory library)
+===================
+./configure --prefix=/usr/local          
+make                                                                      
+make test                                                                 
+make install
+
+# make install required for drop-in install
+
+open_ssl
+========
+./config --prefix=/usr/local 
+## --openssldir=/usr/local/openssl
+## $ make install #hold that thought
+make                                                                        
+make test                                                                   
+
+mod_ssl (the apaci way)
+=======
+./configure \
+--with-apache=../apache_1.3.9
+##\
+##--with-mm=../mm-1.0.11 \
+##--prefix=/usr/local
+	
+	
+PHP3
+====
+Assumption: you are either compiling IMAP, or are lucky enough to have all of
+the crap that PHP wants.  Prolly #1.
+
+Requirements:
+gd graphics libs > 1.3.3 (both regular and devel packages)
+UW IMAP (compile from scratch, with notes below)
+	Alternative to UW IMAP for RH 5.2 systems:
+	get the apache-cclient.tar.gz tarball from the same place you
+	got this text file.
+gdbm database (development package)
+bison package
+
+Complile UW IMAP.  Easy, untar, and type make.
+Copy the src/c-client/mail.h, rfc822.h, linkage.h 
+to /usr/local/include; copy c-client.a  to /usr/local/lib, and 
+do a ln -s c-client.a libc-client.a
+
+Copy the iampd/imapd.o file from the UW IMAP to the php-3.0.x/dl/imap/,
+then run dl/setup, followed by dl/make imap.so.
+Heed the instructions that it spits out after you run setup
+
+Copy the imap.so shared library to /usr/local/lib, or wherever your
+library files go to...
+
+cd ../php-3.0.x                                                                 
+./configure --with-mysql \
+--with-apache=../apache_1.3.9 \
+--enable-track-vars \
+--with-imap=/usr/local \
+--with-mysql=/usr \
+--disable-short-tags \
+--enable-sysvsem \
+--enable-sysvshm
+## --with-xml \
+## --with-ldap=/usr/local \
+
+make                                                                            
+
+make install                                                                    
+
+# make install required for drop-in install
+
+cp php3.ini-dist /usr/local/lib/php3.ini
+
+
+
+
+mod_perl
+========
+
+cd ../mod_perl-x.xx
+perl Makefile.PL \
+USE_APACI=1 EVERYTHING=1 DO_HTTPD=1 PREP_HTTPD=1 \
+SSL_BASE=../openssl-0.9.4 \
+APACHE_PREFIX=../usr/local \
+APACHE_SRC=../apache_1.3.9 \
+APACI_ARGS=--enable-module=ssl,--enable-module=rewrite
+
+# build/test/install Apache/mod_ssl/mod_perl
+su -c "make test ; make install"
+
+# make install required for drop-in install
+
+apache (2nd time)
+=================
+
+cd ../apache_1.3.9                                                              
+SSL_BASE=../openssl-0.9.4 \
+EAPI_MM=../mm-1.0.11 \
+./configure --prefix=/usr/local \
+--enable-module=ssl \
+--activate-module=src/modules/php3/libphp3.a \
+--activate-module=src/modules/perl/libperl.a 
+
+SSL_BASE=../openssl-0.9.4 \
+EAPI_MM=../mm-1.0.11 \
+make 
+make certificate TYPE=custom
+make install
+
+Edit your httpd.conf or srm.conf file and add:
+  AddType application/x-httpd-php3 .php3
+  AddType application/x-httpd-php3-source .phps
+
+FINIS!!!
