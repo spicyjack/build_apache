@@ -75,22 +75,22 @@ echo Is the above correct? [y]
 clear
 echo "Step #2, first apache run"
 cd $src_base/$apache
-./configure --prefix=$install
+#./configure --prefix=$install
 echo
 echo Done with 1st Apache run
-sleep 5s
+#sleep 5s
 
 clear
 echo "Step #3, mm"
 cd ../$mm
-./configure --prefix=$install
-make
-make test
+#./configure --prefix=$install
+#make
+#make test
 
 echo
 echo First su, for the mm software
 echo
-su -c "make install" root
+#su -c "make install" root
 echo
 echo Done with mm
 echo
@@ -103,9 +103,9 @@ clear
 
 echo "Step #4, openssl"
 cd ../$openssl
-./config --prefix=/usr/local 
-make
-make test
+#./config --prefix=/usr/local 
+#make
+#make test
 
 echo
 echo Done with openssl
@@ -119,18 +119,18 @@ clear
 
 echo "Step #5, PHP"
 cd ../$mod_php
-./configure --with-mysql \
---with-apache=../$apache \
---enable-track-vars \
---with-imap=/usr/local \
---with-mysql=/usr \
---disable-short-tags \
---enable-sysvsem \
---enable-sysvshm 
+#./configure --with-mysql \
+#--with-apache=../$apache \
+#--enable-track-vars \
+#--with-imap=/usr/local \
+#--with-mysql=/usr \
+#--disable-short-tags \
+#--enable-sysvsem \
+#--enable-sysvshm 
 
-make
+#make
 
-make install
+#make install
 
 echo
 echo Done with PHP
@@ -144,17 +144,17 @@ clear
 
 echo "Step #6, mod_perl"
 cd ../$mod_perl
-perl Makefile.PL \
-USE_APACI=1 EVERYTHING=1 DO_HTTPD=1 PREP_HTTPD=1 \
-SSL_BASE=../$openssl \
-APACHE_PREFIX=$install \
-APACHE_SRC=../$apache \
-APACI_ARGS=--enable-module=ssl,--enable-module=rewrite
+#perl Makefile.PL \
+#USE_APACI=1 EVERYTHING=1 DO_HTTPD=1 PREP_HTTPD=1 \
+#SSL_BASE=../$openssl \
+#APACHE_PREFIX=$install \
+#APACHE_SRC=../$apache \
+#APACI_ARGS=--enable-module=ssl,--enable-module=rewrite
 
 echo Second su, for the mod_perl software
 echo
-su -c "make test" root
-make install
+#su -c "make test" root
+#make install
 
 echo
 echo Done with mod_perl
@@ -168,6 +168,8 @@ clear
 
 echo "Step #7, Apache, 2nd time"
 cd ../$apache
+SSL_BASE=$src_base/$openssl \
+EAPI_MM=$src_base/$mm \
 ./configure --prefix=$install \
 --enable-module=ssl \
 --activate-module=src/modules/php3/libphp3.a \
