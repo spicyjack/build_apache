@@ -15,14 +15,36 @@ best remove them or they may get stomped.
 
 OpenSSL (http://www.openssl.org/source/)
 ----------------------------------------
-./Configure <machine_type> --prefix=$PREFIX
-./config --prefix=$PREFIX
+./Configure <machine_type> --prefix=$PREFIX 
+
+*OR*
+
+./config --openssldir=$PREFIX/ssl
+
+if you're not sure which one you need, read the docs. The ./config command
+above will install everything into $PREFIX/ssl
+
 make
 sudo make install
 
 To figure out what <machine_type> to use, just run the Configure script with no
 arguments.  You'd want to make sure that you build with shared libraries, if
 your platform supports this.  The 'config' script doesn't always get it right.
+
+IMAP 2002e
+----------
+Unpack the IMAP tarball, then edit "src/osdep/unix/Makefile".  At the top of
+that file, there are a bunch of SSL-related compile directives.  Change those
+directives so that they match your SSL installation;
+SSLDIR=/usr/lib/ssl
+SSLCERTS=/etc/ssl/certs
+SSLKEYS=$(SSLCERTS)
+SSLINCLUDE=/usr/include/openssl
+SSLLIB=$(SSLDIR)/lib
+
+then compile IMAP with:
+
+make slx
 
 PostgreSQL 7.3.x (http://www.postgresql.org/mirrors-ftp.html)
 ----------------
@@ -85,15 +107,18 @@ compile options you can set in Apache, use './configure --help'
 ./configure \
 --prefix=$PREFIX \
 --enable-auth-dbm \
+--enable-auth-digest \
 --enable-example \
+--enable-dav \
 --enable-mem-cache \
 --enable-usertrack \
 --enable-ssl \
---with-ssl=$PREFIX \
 --enable-static-htpasswd \
 --enable-static-ab \
 --enable-mods-shared=all \
 --with-mpm=worker
+
+#--with-ssl=$PREFIX \
 
 --with-ssl=$PREFIX doesn't work for some reason.  Check the apache
 source/readme, see if you can figure out how to get Apache to use ssl libs that
@@ -132,16 +157,19 @@ PHP 4.3.2 (http://www.php.net/download)
 ---------------------------------------
 
 # need oracle client package
+# need zlib headers
+# need gdbm headers
 
 ./configure --prefix=$PREFIX \
 --with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=$PREFIX/conf \
 --with-mysql \
 --with-pgsql \
---with-zlib-dir=/lib \ # need zlib header
+--with-zlib-dir=/lib \
 --with-xml \
---with-openssl=$PREFIX \
---with-gdbm \ # need gdbm headers
+--with-openssl=$PREFIX/ssl \
+--with-imap=/usr/local/src/apache/imap \
+--with-gdbm \
 --with-gettext \
 --enable--sysvsem \
 --enable-sysvshm \
@@ -150,12 +178,4 @@ PHP 4.3.2 (http://www.php.net/download)
 --enable-inline-optimization \
 --enable-trans-sid \
 --enable-track-var
-
-==============================================
-PHPWiki todos
-
-- make admin user name 'tiki' with tiki's password
-- set up a manningb account, move work stuff from personal wiki to work wiki
-- make a list of things that we would want to keep track of for each machine we
-  manage
 
