@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+  <title>Apache SSL Outline</title>
+  <meta name="author" content="Brian">
+</head>
+<body style="color: rgb(0, 0, 0); background-color: rgb(255, 255, 255);"
+ link="#0000ff" alink="#000088" vlink="#ff0000">
+<h2>Apache SSL outline</h2>
+<h4>References</h4>
+<ul>
+  <li>mod_ssl documentation ( <a href="http://www.modssl.org/docs/2.8/">http://www.modssl.org/docs/2.8/</a>,
+also installed locally in the 'htdocs' directory, in Apache's
+ServerRoot)</li>
+</ul>
+<h4>Basics</h4>
+<ul>
+  <li>generate a key</li>
+  <li>create an un-password protected key ( optional, for scripted
+restarts )<br>
+  </li>
+  <li>generate a CSR</li>
+  <li>send in the CSR to a CA to get it signed (use Verisign's test
+signature service), and become your own CA and sign your own
+certificates. &nbsp;When signing your own cert, describe how to change
+the signing length, using the openssl.cnf file</li>
+  <li>install the key and certificate files in apache by editing the
+httpd.conf file</li>
+  <li>check apache by using the configtest target</li>
+  <li>restart apache, but enter the password wrong, to show what the
+output looks like</li>
+  <li>check apache using ps</li>
+  <li>check things in a browser<br>
+  </li>
+</ul>
+<h4>Chain loading in SSL v3.0</h4>
+From the mod_ssl documentation:<br>
+<br>
+<span style="font-style: italic;">"</span><span
+ style="font-style: italic;">One of the benefits in SSL 3.0 is that it
+adds support of certificate chain loading. This feature allows a server
+to pass a server certificate along with issuer certificates to the
+browser. Chain loading also permits the browser to validate the server
+certificate, even if Certificate Authority certificates are not
+installed for the intermediate issuers, since they are included in the
+certificate chain."</span><br>
+<h4>Step-by-step procedure</h4>
+The person applying for the certificate from a third party CA will need
+following information:
+<pre>* Country Name [The two letter ISO code; for example, the&nbsp;<br>&nbsp; United States is 'US']&nbsp;<br>* State or Province Name [Full State Name]<br>* Locality [The city your company is in]&nbsp;<br>* Organization name [IMPORTANT: This must be the same as what's&nbsp;<br>&nbsp; listed with the your DUNS number.&nbsp; If this is wrong, the <br>&nbsp; Certificate Signing Request (CSR) will be REJECTED by the&nbsp;<br>&nbsp; Certificate Authority (CA)]&nbsp;<br>* Organizational Unit Name [What part of your company is&nbsp;<br>&nbsp; requesting the certificate; Web Team works if you don't have&nbsp;<br>&nbsp; anything specific]&nbsp;<br>* Common name [This is what the server will be called on the&nbsp;<br>&nbsp; internet, it's URL or 'www' address.&nbsp; Example: 'www.widgets.com'] <br>* E-mail address [Your contact e-mail address, in case the CA&nbsp;<br>&nbsp; wants to contact you]<br>* Phone Number [Your phone number in case the CA wants to contact you]</pre>
+More information on certificate signing requests can be found here: <a
+ href="http://www.thawte.com/getinfo/products/server/overview.html#4.%20Enrollment%20Instructions">http://www.thawte.com/getinfo/products/server/overview.html#4.
+Enrollment Instructions<br>
+<br>
+</a>Ensure you have openssl installed on your system:
+<p><tt><font color="#3333ff">which openssl</font></tt> </p>
+<p>Make the Apache server key (NOTE: '-rand' option below is only for
+Solaris)</p>
+<p><tt>[logan5][root /usr/local/apache/conf]$ <font color="#3333ff">openssl
+\</font></tt> <br>
+<tt><font color="#000000">&gt;</font><font color="#3333ff"> genrsa -des3
+-out kplug.key 1024 \</font></tt> <br>
+<tt><font color="#000000">&gt; </font><font color="#3333ff">-rand
+/var/log/authlog:/var/adm/messages.0:/var/adm/messages</font></tt> <br>
+<tt><font color="#009900">Generating RSA private key, 1024 bit long
+modulus</font></tt> <br>
+<tt><font color="#009900">................................................++++++</font></tt> <br>
+<tt><font color="#009900">........................................++++++</font></tt> <br>
+<tt><font color="#009900">e is 65537 (0x10001)</font></tt> <br>
+<tt><font color="#009900">Enter PEM pass phrase: </font><font
+ color="#3333ff">(SSL key password here)</font></tt> <br>
+<tt><font color="#009900">Verifying password - Enter PEM pass phrase: </font><font
+ color="#3333ff">(SSL key password again to verify)</font></tt> </p>
+<p>You can see the details of your private key if you issue the
+following command:</p>
+<p><tt>[logan5][root /usr/local/apache/conf]$ <font color="#3333ff">openssl
+rsa -noout -text -in kplug.key<br>
+</font></tt><br>
+Now create a CSR.&nbsp; You will be entering in your information when
+creating the CSR. Be sure to have the correct domain name and company
+name!&nbsp; The "Organization Name" should match what is listed with
+your&nbsp; DUNS number, if you have one. If you do have a DUNS number,
+and misspell your Company name in your CSR, Verisign will reject the
+CSR request. The "Common Name" is the URL that will be used for SSL.
+Leave the challenge password and optional company name blank. </p>
+<p><tt>[logan5][root /usr/local/openssl/bin]$ <font color="#3333ff">openssl
+req -new -key kplug.key -out kplug.csr</font></tt> <br>
+<tt><font color="#009900">Using configuration from
+/usr/local/apache/ssl/ssl/openssl.cnf</font></tt> <br>
+<tt><font color="#009900">You are about to be asked to enter
+information that will be incorporated</font></tt> <br>
+<tt><font color="#009900">into your certificate request.</font></tt> <br>
+<tt><font color="#009900">What you are about to enter is what is called
+a Distinguished Name or a DN.</font></tt> <br>
+<tt><font color="#009900">There are quite a few fields but you can
+leave some blank</font></tt> <br>
+<tt><font color="#009900">For some fields there will be a default value,</font></tt> <br>
+<tt><font color="#009900">If you enter '.', the field will be left
+blank.</font></tt> <br>
+<tt><font color="#009900">-----</font></tt> <br>
+<tt><font color="#009900">Country Name (2 letter code) [AU]:</font><font
+ color="#3333ff">US</font></tt> <br>
+<tt><font color="#009900">State or Province Name (full name)
+[Some-State]:</font><font color="#3333ff">California</font></tt> <br>
+<tt><font color="#009900">Locality Name (eg, city) []:</font><font
+ color="#3333ff">San Diego</font></tt> <br>
+<tt><font color="#009900">Organization Name (eg, company) [Internet
+Widgits Pty Ltd]:</font><font color="#3333ff">Kernel Panic User's Group</font></tt> <br>
+<tt><font color="#009900">Organizational Unit Name (eg, section) []:<span
+ style="color: rgb(51, 51, 255);">KPLUG Admins</span></font></tt> <br>
+<tt><font color="#009900">Common Name (eg, YOUR name) []:</font><font
+ color="#3333ff">www.kernel-panic.org</font></tt> <br>
+<tt><font color="#009900">Email Address []:</font><font color="#3333ff">webmaster@kernel-panic.org</font></tt> </p>
+<p><tt><font color="#009900">Please enter the following 'extra'
+attributes</font></tt> <br>
+<tt><font color="#009900">to be sent with your certificate request</font></tt> <br>
+<tt><font color="#009900">A challenge password []:</font><font
+ color="#3333ff">(Hit enter)</font></tt> <br>
+<tt><font color="#009900">An optional company name []:</font><font
+ color="#3333ff">(Hit enter)</font></tt> </p>
+<p>The resulting CSR will look like: </p>
+<p><tt><font color="#009900">-----BEGIN CERTIFICATE REQUEST-----</font></tt> <br>
+<tt><font color="#009900">MIIB4DCCAUkCAQAwgZ8xCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpDYWxpZm9ybmlh</font></tt> <br>
+<tt><font color="#009900">MRIwEAYDVQQHEwlTYW4gRGllZ28xETAPBgNVBAoUCEFUJlQgRU5TMRQwEgYDVQQL</font></tt> <br>
+<tt><font color="#009900">EwtXZWIgU3VwcG9ydDEXMBUGA1UEAxMOd3d3LmF0dGVucy5jb20xJTAjBgkqhkiG</font></tt> <br>
+<tt><font color="#009900">9w0BCQEWFndlYi1zdXBwb3J0QGF0dGVucy5jb20wgZ8wDQYJKoZIhvcNAQEBBQAD</font></tt> <br>
+<tt><font color="#009900">gY0AMIGJAoGBANWWuDc1SA9d1kFBXOfRVYtBapiKfQp5Uk/egp5dBSKh84o0wt6S</font></tt> <br>
+<tt><font color="#009900">sTTst200fp4opIzsrpKL54vohg2ne6cSe03BxG/iBj1gklSlU+PhrN1ScwvMSsSZ</font></tt> <br>
+<tt><font color="#009900">8qhVksLqK4ahmsHdyoTbtgN+SGNP8GgtZ1c/QFlOPJlIB7wSKw9xpHUbAgMBAAGg</font></tt> <br>
+<tt><font color="#009900">ADANBgkqhkiG9w0BAQQFAAOBgQCTfF9sy9IcUk06/zIuX/JVBX+dmLt8Muaq2OAi</font></tt> <br>
+<tt><font color="#009900">EBe8XGp/oYkP9Q0id2AFLRXX+TLzxpART76eEfFI+iOsdp2m4X53IS5RqNxl+jbd</font></tt> <br>
+<tt><font color="#009900">rPYU1WHpjpQNUu7jtukQKiRGkfeEsh3eHoMBm6cVLtcaq/wrIQ4QIhPAfhVsCI5j</font></tt> <br>
+<tt><font color="#009900">7EFXUw==</font></tt> <br>
+<tt><font color="#009900">-----END CERTIFICATE REQUEST-----</font></tt> </p>
+<p>You can view the details of your CSR with:</p>
+<p><tt>[logan5][root /usr/local/apache/conf]$ <font color="#3333ff">openssl
+rsa -noout -text -in kplug.csr<br>
+</font></tt><br>
+Take this CSR to Verisign and obtain a certificate. When selecting the
+Server Software Vendor, they should choose the "Apache Freeware with
+SSLeay" option. The resulting certificate should look like the CSR, but
+without the "REQUEST" part of the header and footer. &nbsp;Then copy
+the files: </p>
+<p><tt><font color="#3333ff">cp kplug.key
+/usr/local/apache/conf/ssl.key/kplug.key</font></tt> <br>
+<tt><font color="#3333ff">cp kplug.crt
+/usr/local/apache/conf/ssl.crt/kplug.crt</font></tt> </p>
+<p>Enable the new key/certificate pair by editing the Apache httpd.conf
+file: <br>
+<tt><font color="#3333ff">cd /usr/local/apache/conf</font></tt> <br>
+<tt><font color="#3333ff">cp httpd.conf httpd.conf.DATE</font> (where
+DATE is the date, eg 072700)</tt> </p>
+<p>In the following two lines, change "server" to "kplug": <br>
+<tt><font color="#009900">SSLCertificateFile
+/usr/local/apache/conf/ssl.crt/server.crt</font></tt> <br>
+<tt><font color="#009900">SSLCertificateKeyFile
+/usr/local/apache/conf/ssl.key/server.key</font></tt> </p>
+<p>Test the configuration:<br>
+<tt><font color="#3333ff">/usr/local/apache/bin/apachectl configtest<br>
+</font></tt><br>
+Restart Apache: <br>
+<tt><font color="#3333ff">/usr/local/apache/bin/apachectl</font></tt><tt><font
+ color="#3333ff"> restart</font></tt> </p>
+<p>Immeditately check to verify that Apache is running: <br>
+<tt><font color="#3333ff">ps aux | grep http</font></tt> </p>
+<p>Check the website in a browser: <br>
+<tt><font color="#3333ff">http://server/index.html</font></tt> </p>
+<p>And the now enabled SSL site: <br>
+<tt><font color="#3333ff">https://server/index.html</font></tt> </p>
+<p>If Apache does not like the certificate, immediately change the
+httpd.conf back and restart Apache. </p>
+<h4>Removing the SSL key password<br>
+</h4>
+<p>To remove the passphrase on the SSL key (recommended), issue the
+following command: </p>
+<p><tt><font color="#3333ff">openssl rsa -in kplug.key -out kplug.key</font></tt> </p>
+<p><font color="#000000">Then just hit &lt;ENTER&gt; when prompted for
+a new passphrase.</font> <br>
+</p>
+<h4>Becoming your own CA</h4>
+# Create a RSA private key for your CA (will be Triple-DES encrypted and<br>
+# PEM formatted):<br>
+<br>
+$ openssl genrsa -des3 -out ca.key 1024<br>
+<br>
+# You can see the details of this RSA private key via the command<br>
+<br>
+$ openssl rsa -noout -text -in ca.key<br>
+<br>
+# And you can create a decrypted PEM version (not recommended) of this
+private<br>
+# key via:<br>
+<br>
+$ openssl rsa -in ca.key -out ca.key.unsecure<br>
+<br>
+# Create a self-signed CA Certificate (X509 structure) with the RSA key
+of the <br>
+# CA (output will be PEM formatted):<br>
+$ openssl req -new -x509 -days 365 -key ca.key -out ca.crt<br>
+<br>
+# sign the CSR with sign.sh (from mod_ssl source, in pkg.contrib
+directory)<br>
+<br>
+$ sign.sh kplug.csr<br>
+<br>
+<br>
+</body>
+</html>
