@@ -46,6 +46,7 @@ MM (http://www.ossp.org/pkg/lib/mm/#tarballs)
 ./configure --prefix=$PREFIX --disable-static
 #./configure (problems with apache finding libmm in the apache runtime tree?)
 make
+make test (or 'time make test')
 sudo make install
 
 OpenSSL 0.9.7x (http://www.openssl.org/source/)
@@ -56,6 +57,7 @@ The 'shared' statement will make OpenSSL build shared libraries.  You want
 this (see e-mail thread at the bottom of this file).
 
 make
+make test (or 'time make test')
 sudo make install
 
 Apache 2.0.xx
@@ -174,8 +176,8 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 # added kerberos support cause c-client Debian package wants it (03Mar2005)
 # copy out the file mm.h to /usr/local/include so that PHP can find it
 
-./configure --prefix=$PREFIX --with-apxs2=$PREFIX/bin/apxs 
---with-config-file-path=$PREFIX/conf \
+./configure --prefix=${PREFIX}/php-5.0.4 --with-apxs2=${PREFIX}/bin/apxs \
+--with-config-file-path=${PREFIX}/conf \
 --with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
 --with-mysql --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sqlite-utf8 --with-pgsql --with-zlib-dir=/lib \
@@ -183,12 +185,36 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 --with-gdbm --with-xpm-dir=/usr/X11R6 --with-gettext \
 --enable--sysvsem --enable-sysvshm --enable-force-cgi-redirect \
 --enable-calendar --enable-inline-optimization \
---enable-trans-sid --enable-track-var --with-imap \
+--enable-trans-sid --enable-track-var --with-imap-ssl \
 --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib --enable-exif \
---with-mm --disable-short-tags --with-kerberos
+--with-mm --disable-short-tags --with-kerberos --with-mcrypt
 
 make
 sudo make install
+
+PHP 4.2.x (http://www.php.net/download)
+---------------------------------------
+Used for PHPWiki on observer.  Dirty black magick.  Both PHP4 and PHP5 are
+installed for one Apache binary, but the config files determine which PHP
+module is used for a specific running copy of apache.
+
+*** WARNING *** 
+
+Make sure you have different configuration/log files for each copy of Apache
+you run on the same machine.  Failure to heed this warning *will* cause
+unpredictable results.  *YOU* *HAVE* *BEEN* *WARNED*.
+
+./configure  --prefix=${PREFIX}/php-4.3.11 \
+--with-apxs2=${PREFIX}/bin/apxs \
+--with-config-file-path=/etc/apache-wiki \
+--with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
+--with-pgsql=/usr --with-mysql=/usr --with-xpm-dir=/usr/X11R6 \
+--with-mm=/usr/local/apache-2.0.54 --with-zlib --with-gettext \
+--with-zlib-dir=/usr/lib  --with-xml  --with-gdbm --with-openssl=/usr \
+--enable-sysvsem  --enable-sysvshm  --enable-force-cgi-redirect \
+--enable-calendar  --enable-inline-optimization  --enable-trans-sid \
+--enable-track-vars --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib \
+--with-xpm-dir=/usr/X11R6/lib
 
 OpenSSL Shared Libraries
 ------------------------
