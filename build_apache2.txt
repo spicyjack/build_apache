@@ -1,3 +1,10 @@
+*TODOS*
+- Add in user/group stuff from build_linux
+- add in mod_deflate and config info from Apache docs
+- add in changing all of the scoreboard/session files to use shared memory
+  instead of files
+- remove the solaris shared libs thingy at the end of this file
+
 Pre-install: set a PREFIX
 ----------------------------
 for Solaris:
