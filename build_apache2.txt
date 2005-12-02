@@ -1,12 +1,8 @@
-*TODOS*
-- Add in user/group stuff from build_linux
-- add in mod_deflate and config info from Apache docs
-- add in changing all of the scoreboard/session files to use shared memory
-  instead of files
-- remove the solaris shared libs thingy at the end of this file
-
 Pre-install: set a PREFIX
 ----------------------------
+This makes the instructions below work on any Unix-ish operating system, and
+allows for easy relocation of things if you have different build priorities.
+
 for Solaris:
 export PREFIX=/export/home/apache-2.0.xx (where xx is the version you are
 compiling)
@@ -56,13 +52,14 @@ Is the information correct? [y/n] y
 
 MM (http://www.ossp.org/pkg/lib/mm/#tarballs)
 -----------------------------------------------
+NOTE: Apache doesn't seem to use this anymore. PHP can use it still though.
+
 ./configure --prefix=$PREFIX --disable-static
-#./configure (problems with apache finding libmm in the apache runtime tree?)
 make
 make test (or 'time make test')
 sudo make install
 
-OpenSSL 0.9.7x (http://www.openssl.org/source/)
+OpenSSL 0.9.8x (http://www.openssl.org/source/)
 -----------------------------------------------
 ./config --prefix=$PREFIX shared
 
@@ -78,27 +75,14 @@ Apache 2.0.xx
 unpack the tarball, cd into the source directory.  To get a full listing of
 compile options you can set in Apache, use './configure --help'
 
-# FIXME we still need this?
-Before you compile the main httpd binary with LDAP support, you'll need to
-first compile the 'apr-util' with LDAP support as well:
-
-cd $APACHE_SRC/srclib/apr-util
-./configure --with-ldap --with-dbm=gdbm --with-apr=../apr
-make
-
-Then compile Apache:
-
-# FIXME see how the MM shared libs get compiled into 2.0 Apache, or if they
-# are even used at all anymore
-
 ./configure \
---prefix=$PREFIX --with-ssl=$SSL_PREFIX \
+--prefix=$PREFIX --with-ssl=$PREFIX_SSL \
 --enable-auth-dbm  --enable-auth-digest \
---enable-dav --enable-dav-fs \
---enable-deflate --enable-mem-cache --enable-disk-cache \
---enable-info --enable-rewrite --enable-proxy \
---enable-ssl --enable-usertrack  --enable-vhost-alias \
---enable-static-htpasswd --enable-static-ab --enable-mods-shared=all \
+--enable-dav --enable-dav-fs --enable-deflate --enable-disk-cache \
+--enable-info --enable-mem-cache --enable-proxy --enable-rewrite \
+--enable-ssl --enable-usertrack --enable-vhost-alias \
+--enable-static-htpasswd --enable-static-ab \
+--enable-mods-shared=all --with-gdbm=$PREFIX_SUPPORT \
 --with-mpm=prefork
 
 make
@@ -106,63 +90,6 @@ sudo make install
 
 Change the User and Group in httpd.conf that the webserver will run as to the
 user/group you created at the top of this file.
-
-# --enable-example \ # for development only
-# --enable-so \ # enabled when --enable-shared-mods is used as well
-# --enable-ldap=/usr \ # having problems compiling ldap
-# --enable-auth-ldap \ # having problems compiling ldap
-
-For Apache 2.0.47 on Solaris, if you compile using GCC, some of the Apache
-modules don't get linked correctly against libgcc.a.  This is because the
-Apache coders use the GNU ld utility for linking modules, which doesn't come by
-default on the reference system.  You can either link the culprit files by
-hand, or install the GNU binutils and recompile.  See the below URL's for more
-info and solutions:
-
-http://perl.apache.org/docs/1.0/guide/troubleshooting.html#symbol___floatdisf__referenced_symbol_not_found
-http://www.riverside.org/archive/html/new-httpd/2003-01/msg00051.html
-
-For mod_ssl, chances are Apache won't link to the correct archived library
-(libssl.a), and you'll have to re-link the file to create a new shared library.
-(maybe go back in and rebuild the mod_ssl library with all of the lo files in
-the ssl directory)
-
-See also the OpenSSL thread at the bottom of this file.
-
-IMAP 2004 (ftp://ftp.cac.washington.edu/imap/)
------------------------------------------------
-Unpack the IMAP tarball, then edit "src/osdep/unix/Makefile".  At the top of
-that file, there are a bunch of SSL-related compile directives.  Change those
-directives so that they match your SSL installation;
-SSLDIR=/usr/local/apache2
-SSLCERTS=$(SSLDIR)/ssl/certs
-SSLKEYS=$(SSLCERTS)
-SSLINCLUDE=$(SSLDIR)/include
-SSLLIB=$(SSLDIR)/lib
-
-then compile IMAP with:
-
-make slx
-
-Ming SWF Libraries (http://ming.sf.net)
----------------------------------------
-Run 'make' in the ming source directory.  Copy 'libming.so' to /usr/local/lib
-as 'libming.so.0', and create a symlink from that file to 'libming.so'. Copy
-ming.h to /usr/local/include.
-
-libxml2 (http://xmlsoft.org/sources/)
--------------------------------------
-PHP 5.0.x wants recent versions of libxml2.  I can provide
-
--> libxml2
-./configure --with-zlib --disable-static
--> libgpg-error (for libgcrypt, ftp://ftp.gnupg.org/gcrypt/libgpg-error/)
-./configure --disable-static
--> libgcrypt (for libxslt, ftp://ftp.gnupg.org/gcrypt/libgcrypt/)
-./configure --disable-static
--> libxlst (same website)
-./configure --with-libxml-src=../libxml2-2.6.14 --disable-static
-
 
 PHP 5.0.x (http://www.php.net/download)
 ---------------------------------------
@@ -186,18 +113,16 @@ then tell PHP to honor the directive for that directory.
 
 Built with Ming, MySQL and PostgreSQL, and GD drivers
 
-# need oracle client package
 # need zlib headers
 # need gdbm headers
 # need postresql-dev package, which has header files
-# removed ming libs, didn't want (03Mar2005)
 # added kerberos support cause c-client Debian package wants it (03Mar2005)
 # copy out the file mm.h to /usr/local/include so that PHP can find it
 
-./configure --prefix=$PREFIX/php-5.0.5 --with-apxs2=$PREFIX/bin/apxs \
+./configure --prefix=$PREFIX/php-5.1.1 --with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=$PREFIX/conf \
 --with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
---with-mysql=$PREFIX_SSL --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+--with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sqlite-utf8 --with-pgsql --with-zlib-dir=$PREFIX_SUPPORT \
 --with-xml --with-pear --with-openssl=$PREFIX_SSL \
 --with-gdbm --with-xpm-dir=/usr/X11R6 --with-gettext=$PREFIX_SSL \
@@ -210,7 +135,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 make
 sudo make install
 
-PHP 4.2.x (http://www.php.net/download)
+PHP 4.4.x (http://www.php.net/download)
 ---------------------------------------
 Used for PHPWiki on observer.  Dirty black magick.  Both PHP4 and PHP5 are
 installed for one Apache binary, but the config files determine which PHP
@@ -222,209 +147,18 @@ Make sure you have different configuration/log files for each copy of Apache
 you run on the same machine.  Failure to heed this warning *will* cause
 unpredictable results.  *YOU* *HAVE* *BEEN* *WARNED*.
 
-./configure  --prefix=${PREFIX}/php-4.3.11 \
---with-apxs2=${PREFIX}/bin/apxs \
+./configure  --prefix=$PREFIX/php-4.4.x \
+--with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=/etc/apache-wiki \
---with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
+--with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
 --with-pgsql=/usr --with-mysql=/usr --with-xpm-dir=/usr/X11R6 \
---with-mm=/usr/local/apache-2.0.54 --with-zlib --with-gettext \
---with-zlib-dir=/usr/lib  --with-xml  --with-gdbm --with-openssl=/usr \
---enable-sysvsem  --enable-sysvshm  --enable-force-cgi-redirect \
---enable-calendar  --enable-inline-optimization  --enable-trans-sid \
---enable-track-vars --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib \
---with-xpm-dir=/usr/X11R6/lib
-
-OpenSSL Shared Libraries
-------------------------
-For Solaris, you'll need to build OpenSSL as shared libraries instead of static
-libraries.  From the message:
-
-http://www.mail-archive.com/modssl-users@modssl.org/msg15745.html
-
->> Yes, it's a fairly frequently asked question.  The problem is that
->> you've built a shared mod_ssl against a static OpenSSL (ie, libssl.a
->> and libcrypto.a instead of .so).  That won't work because the way the
->> build system currently works, OpenSSL is linked into httpd, not
->> mod_ssl.  httpd doesn't need the symbols from the OpenSSL libraries, so
->> the static linker throws them away, meaning they're no longer available
->> when mod_ssl is dynamically linked at runtime.
->>
->> Solution: use a shared OpenSSL.
->
-> I was wondering how I use a shared OpenSSL.  I was wondering if you can
-> point me to where I can find steps to do this or show me how.
-
-
-I'm CC:'ing this to the modssl-users list, since I'm sure somebody else
-out there probably has the same question.
-
-It's kind of annoying, because the shared library support in OpenSSL is
-"experimental", which in practice just means that the Makefile is
-non-intuitive.  I just ran through it again to make sure I got all the
-steps right... here's what you do.
-
-I'm going to assume that you have the static version of OpenSSL installed
-in /usr/local/lib in this example... just fix the path to match where
-OpenSSL gets installed on your machine.
-
-So let's say you've installed OpenSSL previously, but it's the static
-version, so you have /usr/local/lib/libssl.a and
-/usr/local/lib/libcrypto.a .  Remove those.
-
-Go back to the OpenSSL source directory and do the following:
-
-./config
-make
-make build-shared
-mv libssl.so* /usr/local/lib
-mv libcrypto.so* /usr/local/lib
-ldconfig
-
-(note: do NOT run make install, or it will remove all your shared
-libraries and install the static ones, and you'll have to start over
-again.  :-)
-
-That ought to do it.  I recommend doing a search on your filesystem for
-other, older copies of libssl* and libcrypto* that might be hanging
-around, as sometimes copies get put in strange places and you want to be
-sure to only have one: the most recent.
-Building Apache, by Brian Manning - Last updated 16Oct2004
-
-16Oct2004
--- Apache 2.0.52
--- PHP 5.0.2
--- Added Ming SWF library
--- OpenSSL 0.9.7d
--- Removed MySQL and PostgreSQL database build instructions, added them to the
-build_solaris.txt file.
-
-14Nov2003
--- added section on using tmpfs shared memory ramdisk for file storage
-
-13Aug2003
--- updated to Apache 1.3.28
--- updated to PHP 4.2.3
--- updated to MM 1.3.0
--- added 1st build of Apache, for creating directories for other software
--- added instructions for making PHP use tmpfs space
-
-10Oct2002
--- updated to Apache 1.3.27
--- updated to PHP 4.2.1
--- updated to MM 1.2.1
--- added Oracle support to PHP
-
-20Jun2002
--- updated to Apache 1.3.26
--- updated to PHP 4.2.1
--- moved Apache conf directory out of the Apache install prefix tree, and moved
-the PHP  .ini file to the new Apache config location as well
-
-additions by Bob Hucik 14Oct2001
-    --updated to Apache 1.3.22
-    --added LanguagePrirority to Mozilla character encoding
-    --added my version of PHP install/configure
-    --added Ming and PDF Library to Optional PHP Packages
-    --fixed a few typo's
----------------------------------------------------------------
-Following is a listing of build steps for each part of Apache.  Anything past
-Apache is optional.  This setup will get you enough stuff to run most webmail
-clients out there, like TWIG (http://twig.screwdriver.net/) or IMP/HORDE
-(http://www.horde.org).  More verbose instructions are at the bottom of this
-document.
-
-Preliminary
------------
-Download all the below listed packages that you want to use.  Place them all in
-one directory, and unzip them.  This will be referred to the 'build' directory.
-Inside the build directory, make symlinks to the directories containing the
-source, as the source packages will be referred in these instructions by the
-name of the directory without any version information.  For example, make a
-symlink from 'apache-1.3.x' to 'apache' in the source directory.  The
-destination of all the software will be the name of the Apache version; if you
-are installing Apache 1.3.27 to /export/home, then the full path will be
-/export/home/apache-1.3.27, and a symlink will be made from the install
-directory to /export/home/apache.  Applications that are installed inside the
-Apache tree will also use their full versions into the installation
-directories, with symlink shortcuts. 
-
-Set up the install environment
-------------------------------
-For the bash shell users:
-export PREFIX=/usr/local/apache-2.0.52
-
-Apache (1st Time - http://httpd.apache.org/dist/httpd/)
--------------------------------------------------------
-# We do a basic configure and install of Apache first, so we have a place to
-# install OpenSSL/libmm; that way, each apache install is self-contained, and
-# can be removed without harming the rest of the system
-./configure \
---prefix=$PREFIX \
---enable-module=most \
---enable-shared=max \
---enable-module=so
-
-OpenSSL (http://www.openssl.org/source/)
-----------------------------------------
-./config --prefix=$PREFIX
-make
-sudo make install
-
-MM (http://www.engelschall.com/sw/mm/#tarballs)
------------------------------------------------
-#./configure --prefix=$PREFIX
-./configure (problems with apache finding libmm in the apache runtime tree?)
-make
-sudo make install
-
-mod_ssl (http://www.modssl.org/source/)
----------------------------------------
-See https://bugzilla.redhat.com/bugzilla/long_list.cgi?buglist=61030 for a
-description on how to move the location of the shared memory semaphore file
-'httpd.mm.$PID.sem'
-
-See also http://www.modssl.org/docs/2.8/ssl_faq.html#ToC14 for the reason why
-there's no shared memory file (httpd.mm.$PID.sem) configuration directive.
-
-./configure \
---with-apache=../apache \
---with-ssl=$PREFIX \
---enable-shared=ssl
-
-Upgrades to mod_ssl
--------------------
-./configure \
---with-apxs=/usr/local/apache/bin \
---with-ssl=/usr/local \
---with-mm=/usr/local
-
-make
-sudo make install
-make distclean
-
-Apache (http://httpd.apache.org/dist/httpd/)
---------------------------------------------
-SSL_BASE=$PREFIX \
-EAPI_MM=/usr/local/src/apache/mm \
-./configure \
---prefix=$PREFIX \
---enable-module=ssl \
---enable-module=most \
---enable-shared=max \
---enable-rule=EAPI \
---enable-rule=SHARED_CORE \
---enable-rule=SHARED_CHAIN \
---enable-module=so
-
-make
-make certificate TYPE=custom
-sudo make install
-
-Note: Mozilla's default character encoding type is 'en-US', which apache knows
-nothing about.  So if you don't want Mozilla to come up with pages of
-gobbledeygook, then you need to 'AddLanguage en-US .us' in the httpd.conf file
-in Apache.  Same goes with en-UK and en-AU as well. Also you need to add
-en-US as the first language in the LanguagePriority section.
+--with-mm=$PREFIX --with-zlib --with-gettext \
+--with-zlib-dir=/usr/lib  --with-xml  --with-gdbm \
+--with-openssl=$PREFIX_SSL --enable-sysvsem  --enable-sysvshm \
+--enable-force-cgi-redirect --enable-calendar \
+--enable-inline-optimization  --enable-trans-sid \
+--enable-track-vars --with-jpeg-dir=$PREFIX_SUPPORT \
+--with-png-dir=$PREFIX_SUPPORT --with-xpm-dir=/usr/X11R6/lib
 
 ---
 Fun with SSL ciphers:
@@ -449,8 +183,8 @@ openssl ciphers -v 'ALL:-EXP:-DES:-eNULL:-aNULL'
 ===========================
 Shared memory file storage:
 ===========================
-If you have the Linux shared memory driver turned on (it's called tmpfs), you
-can set up an area in the filesystem for storing temporary files.  Storing
+If your operating system supports shared memory (or in other words, ramdisks),
+you can set up an area in the filesystem for storing temporary files.  Storing
 things like PHP session data, and various Apache semaphores on a memory-based
 disk system would speed things up a wee bit, plus, you don't need that crap
 anyways, so machine reboots would purge that data from the system
@@ -467,221 +201,8 @@ tmpfs filesystem gets created at boottime:
 
 apachetmp   /var/lib/apache tmpfs size=8M
 
-See also the mod_ssl entry on EAPI above
-
-----
-IMAP (http://www.washington.edu/imap/)
-----
-make slx
-
-
-PHP (http://www.php.net/downloads.php)
---------------------------------------
-See below for more details about this specific build as well as other software
-dependencies that PHP requires before it will build.  If you are building IMAP,
-you just have to 'make' the source, you don't have to install it, PHP pulls
-what it needs out of the source.
-
-Since PHP disables 'register_globals' by default, if you have an application
-that uses global variables (variables read in from the HTTP server environment
-and/or HTTP POST variables), you can tell Apache to enable 'register_globals'
-on a per-directory basis.  Here's an example for PHP 4.3.x:
-
-<Directory /path/to/some/php/application>
-        <IfModule sapi_apache2.c>
-            php_flag register_globals On
-            php_flag magic_quotes_gpc On
-            php_flag track_vars On
-        </IfModule>
-</Directory>
-
-The trick is to grep for 'STANDARD20_MODULE_STUFF' in the PHP source to find
-thename of the C source file that contains the above string.  Place the
-filename of that C source file in the IfModule directive above, and Apache will
-then tell PHP to honor the directive for that directory.
-
-Built with Ming, MySQL and PostgreSQL, and GD drivers
- 
---with-ldap=/usr \
-
-./configure  --prefix=/usr/local/apache-2.0.x \
---with-apxs=/usr/local/apache-2.0.x/bin/apxs \
---with-imap-ssl=/usr/local/src/imap \
---with-config-file-path=/usr/local/apache2conf \
---with-gd --enable-gd-imgstrttf --with-freetype-dir=/usr \
---with-pgsql=/usr --with-mysql=/usr --with-xpm-dir=/usr/X11R6 \
---with-mm=/usr/local/lib  --with-zlib --with-gettext \
---with-zlib-dir=/usr/lib  --with-xml  --with-gdbm --with-openssl=/usr \
---enable-sysvsem  --enable-sysvshm  --enable-force-cgi-redirect \
---enable-calendar  --enable-inline-optimization  --enable-trans-sid \
---enable-track-vars --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib \
---with-xpm-dir=/usr/X11R6/lib
-
-
-make
-make install
-
-cp php.ini-dist /export/home/apache/conf/php.ini
-
-Add the following directives to Apache's httpd.conf file:
-AddType application/x-httpd-php .php
-AddType application/x-httpd-php .php3
-AddType application/x-httpd-php3-source .phps
-
-And add the following types to the DirectoryIndex direcive:
-index.php index.php3
-
-After I built PHP, if I do configtest in Apache, it complains about not seeing
-the libs for MySQL and PostgreSQL.  They're located under /export/home, so
-they're not in the system's library path.  In Solaris, this is set in
-/etc/profile, as LD_LIBRARY_PATH.  Copying libpq.so.?.? and
-libmysqlclient.so.?.? to Apache's libexec directory fixed it's bitching, but
-strangely adding the above paths did not.
-
-mod_perl (http://perl.apache.org/)
--------
-perl Makefile.PL \
-USE_APXS=1 \
-WITH_APXS=/usr/local/apache/bin/apxs \
-EVERYTHING=1
-
-make
-make install
-
-FastCGI (http://www.fastcgi.com)
--------
-$PREFIX/bin/apxs -o mod_fastcgi.so -c *.c
-sudo $PREFIX/bin/apxs -i -a -n fastcgi mod_fastcgi.so 
-			
-If you are using /usr/local/apacheconf as your config directory, make sure you
-copy the mod_fastcgi directives from $PREFIX/conf/httpd.conf to
-/usr/local/apacheconf/httpd.conf.
-
-ModDAV (http://www.webdav.org/mod_dav/)
-------
-./configure --with-apxs=$PREFIX/bin/apxs
-
-make
-sudo make install
-
-If you are using /usr/local/apacheconf as your config directory, make sure you
-copy the mod_fastcgi directives from $PREFIX/conf/httpd.conf to
-/usr/local/apacheconf/httpd.conf.
-
-===============================================================
-More Information
-================================================================
-These instructions will build everything but Apache and mod_ssl as DSO's, or in
-Apache-speak, loadable modules.  Loadable modules are a good thing because if
-you don't want to use the module, you can unload it.  And you can update each
-module as new versions come out, that way you don't end up recompiling Apache
-every time something new shows up.
-
-Assumptions:
-------------
-You want to install Apache and all of it's junk in the /usr/local tree.  If
-that is false, change everything below that says --prefix=/usr/local to
-something you like instead.
-
-Tips
-----
-1) unpack all of the tarballs into one directory. make sure that MySQL is
-already installed
-
-2) go into the individual directories, and run the configures/makes for all of
-the pieces parts
-
-3) watch those bash shell tab completions.  If it adds an extra forward slash
-to the end of a directory name, you can bet it will fuck up the make scripts.
-
-PHP
-===
-Assumption: you are either compiling IMAP from scratch, or are lucky enough to
-have all of the dependencies that PHP is looking for.   
-
-PHP Extra Module Requirements (Optional)
-----------------------------------------
-- gd graphics libs > 1.3.3 (both regular and devel packages)
-(http://www.boutell.com/gd/#getgd)
--libjpeg (http://www.ijg.org/)
--libpng (http://www.libpng.org/pub/png/libpng.html)
--libungif (http://prtr-13.ucsc.edu/~badger/software/libungif/index.shtml)
--libXpm (ftp://ftp.x.org/contrib/libraries/)
-- FreeType (http://freetype.sourceforge.net/download.html#freetype2)
-- UW IMAP (compile from scratch, with notes below)
-- gdbm database (including development package if you are installing from
-  packages)
-- bison package
-- Ming Library (http://www.opaque.net/ming) Current version 0.2a
-- PDF Library (http://www.pdflib.com) Current version 4.0.1
-
-If you don't want to install IMAP over an extisting IMAP binary that's already
-on your system, you can do the steps below:
-
->From the IMAP source directory, copy the src/c-client/mail.h, rfc822.h,
-linkage.h to /usr/local/include; copy c-client.a  to /usr/local/lib, and do a
-ln -s c-client.a libc-client.a
-
-Copy the imapd/imapd.o file from the UW IMAP to the php-3.0.x/dl/imap/,
-then run dl/setup, followed by dl/make imap.so.
-Heed the instructions that it spits out after you run setup
-
-Copy the imap.so shared library to /usr/local/lib, or wherever your
-library files go to...
-
-PHP Session Variables and RAMDISK
----------------------------------
-Another good idea for PHP is to use a ramdisk to store session ID info, this
-will remove the system drives from the equasion, and should really speed things
-up.
-
-To set up a ramdisk, your Linux kernel needs to have 'tmpfs' compiled; when you
-issue the command 'cat /proc/filesystems | grep tmpfs', you should see
-something output that has the word 'tmpfs' in it.  If you don't see any output,
-you're not using tmpfs.  Once you have tmpfs 'installed', to use it, you just
-issue the 'mount' command, and the kernel will build the filesystem in memory
-right then.  For example, assuming you have a subdirectory called 'test' in the
-current directory, you can create a tmpfs filesystem by issuing the following
-command:
-
-mount -t tmpfs -o size=4m testtmpfs test/
-
-To make it more permanent, just add it to your system's /etc/fstab:
-
-apachetmp   /var/lib/apache tmpfs size=8M                   0   0
-
-This will create a filesystem called 'apachetmp' at /var/lib/apache, and it
-will be 8 megabytes in size.  You could probably go much lower than this if you
-have a infrequently visited site, or may need more if you get lots of traffic.
-To get PHP to use 'apachetmp' as the place where it stores session files, open
-up the php.ini file on your system, and make the following change:
-
-; Argument passed to save_handler.  In the case of files, this is the path
-; where data files are stored.
-session.save_path = /var/lib/apache
-
-Restart Apache with the new setup, and hit a PHP page that uses sessions, and
-you should now see files in your tmpfs filesystem.
-
-Adding the new user/group for Apache to run as
-==============================================
-[observer][root /usr/local/apache-1.3.22/conf]$ addgroup --gid 65533 httpd
-Adding group httpd (65533)...
-Done.
-[observer][root /usr/local/apache-1.3.22/conf]$ adduser --no-create-home --gid
-65533 --uid 65533 --disabled-password httpd
-Adding user httpd...
-Adding new user httpd (65533) with group httpd.
-Home directory /home/httpd already exists.  Not copying from /etc/skel
-Changing the user information for httpd
-Enter the new value, or press return for the default
-Full Name []: Apache Runtime User
-Room Number []: 
-Work Phone []: 
-Home Phone []: 
-Other []: 
-Is the information correct? [y/n] y
-
+OS X users can use the 'hdid' command to create a ramdisk.  See the hdid
+manpage for more information.
 
 Generating SSL certificates
 ===========================
