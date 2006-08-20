@@ -70,8 +70,8 @@ make
 make test (or 'time make test')
 sudo make install
 
-Apache 2.0.xx
--------------
+Apache 2.0.xx (http://httpd.apache.org/download.cgi)
+----------------------------------------------------
 unpack the tarball, cd into the source directory.  To get a full listing of
 compile options you can set in Apache, use './configure --help'
 
@@ -91,7 +91,7 @@ sudo make install
 Change the User and Group in httpd.conf that the webserver will run as to the
 user/group you created at the top of this file.
 
-PHP 5.0.x (http://www.php.net/download)
+PHP 5.1.x (http://www.php.net/download)
 ---------------------------------------
 Since PHP disables 'register_globals' by default, if you have an application
 that uses global variables (variables read in from the HTTP server environment
@@ -119,7 +119,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 # added kerberos support cause c-client Debian package wants it (03Mar2005)
 # copy out the file mm.h to /usr/local/include so that PHP can find it
 
-./configure --prefix=$PREFIX/php-5.1.1 --with-apxs2=$PREFIX/bin/apxs \
+./configure --prefix=$PREFIX/php-5.1.5 --with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=$PREFIX/conf \
 --with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
 --with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
@@ -135,7 +135,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 make
 sudo make install
 
-PHP 4.4.x (http://www.php.net/download)
+PHP 4.4.4 (http://www.php.net/download)
 ---------------------------------------
 Used for PHPWiki on observer.  Dirty black magick.  Both PHP4 and PHP5 are
 installed for one Apache binary, but the config files determine which PHP
@@ -147,7 +147,7 @@ Make sure you have different configuration/log files for each copy of Apache
 you run on the same machine.  Failure to heed this warning *will* cause
 unpredictable results.  *YOU* *HAVE* *BEEN* *WARNED*.
 
-./configure  --prefix=$PREFIX/php-4.4.x \
+./configure  --prefix=$PREFIX/php-4.4.4 \
 --with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=/etc/apache-wiki \
 --with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
