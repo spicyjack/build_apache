@@ -160,6 +160,27 @@ unpredictable results.  *YOU* *HAVE* *BEEN* *WARNED*.
 --enable-track-vars --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-xpm-dir=/usr/X11R6/lib
 
+make
+sudo make install
+
+Testing New Apache Installs
+---------------------------
+In order to make sure your new Apache install is happy, run the new httpd
+binary with the '-t' switch, which tells the binary to test but don't run.
+Example:
+
+/usr/local/new/apache/bin/httpd -t -f /path/to/test/httpd.conf
+
+If you leave the forward slash off of the front of the config file, the config
+file will be searched for underneath the directory listed in the ServerRoot
+configuration directive, whatever path was compiled into Apache.
+
+If Apache is happy with your test config file, you can then remove the '-t'
+switch above to start a test server.  You need to make sure that your test
+server runs on a different port number than your production server, or the test
+server will fail to start as it can't bind to a port that's already open
+(opened by the production copy of Apache most likely).
+
 ---
 Fun with SSL ciphers:
 ---
