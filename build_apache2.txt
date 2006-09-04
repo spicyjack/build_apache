@@ -70,13 +70,26 @@ make
 make test (or 'time make test')
 sudo make install
 
-Apache 2.0.xx (http://httpd.apache.org/download.cgi)
+Apache 2.2.xx (http://httpd.apache.org/download.cgi)
 ----------------------------------------------------
 unpack the tarball, cd into the source directory.  To get a full listing of
 compile options you can set in Apache, use './configure --help'
 
 ./configure \
 --prefix=$PREFIX --with-ssl=$PREFIX_SSL \
+--enable-modules=all --enable-mods-shared=all \
+--enable-authn-dbm --enable-authn-anon --enable-authn-dbd \
+--enable-authn-alias --enable-authz-dbm --enable-authz-owner \
+--enable-auth-digest --enable-file-cache \
+--enable-cache --enable-disk-cache --enable-mem-cache \
+--enable-dbd --enable-echo --enable-ldap --enable-deflate \
+--enable-mime-magic --enable-http --enable-dav --enable-info \
+--enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
+--enable-vhost-alias --enable-rewrite --enable-so \
+--with-mpm=prefork --enable-proxy --enable-proxy-connect \
+--enable-proxy-ftp --enable-proxy-http --enable-ssl --enable-static-htpasswd 
+
+#--with-ldap --enable-authnz-ldap
 --enable-auth-dbm  --enable-auth-digest \
 --enable-dav --enable-dav-fs --enable-deflate --enable-disk-cache \
 --enable-info --enable-mem-cache --enable-proxy --enable-rewrite \
@@ -231,7 +244,7 @@ For the initial SSL cert generation, you can use 'make certificate type=CUSTOM'
 inside of Apache.  This will generate both the custom Certificate Authority
 (CA) certificate (ca.crt) , and the server's certificate (server.crt).  Once
 you have a CA certificate, you can sign more certificates.  There's a shell
-script inside of mod_ssl called 'sign.sh' that will do the work for you.
+script inside of OpenSSL called 'CA.pl' that will do the work for you.
 Here's how you use it:
 
 # Create a RSA private key for your Apache server (will be Triple-DES
@@ -274,6 +287,8 @@ openssl x509 -in server.crt -out server.crt.pem -outform PEM
 
 Creating a CA certificate
 =========================
+$ CA.pl -newca
+
 # Create a RSA private key for your CA (will be Triple-DES encrypted and
 # PEM formatted):
 
