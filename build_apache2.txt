@@ -4,16 +4,16 @@ This makes the instructions below work on any Unix-ish operating system, and
 allows for easy relocation of things if you have different build priorities.
 
 for Solaris:
-export PREFIX=/export/home/apache-2.0.xx (where xx is the version you are
+export PREFIX=/export/home/apache-2.2.xx (where xx is the version you are
 compiling)
 
 for Debian Linux:
-export PREFIX=/usr/local/apache-2.0.xx
+export PREFIX=/usr/local/apache-2.2.xx
 export PREFIX_SSL=$PREFIX
 export PREFIX_SUPPORT=/usr/lib
 
 for Mac OS X:
-export PREFIX=/usr/local/stow/apache-2.0.xx 
+export PREFIX=/usr/local/stow/apache-2.2.xx 
 export PREFIX_SSL=/opt/local/
 export PREFIX_SUPPORT=/opt/local/lib
 
@@ -78,25 +78,16 @@ compile options you can set in Apache, use './configure --help'
 ./configure \
 --prefix=$PREFIX --with-ssl=$PREFIX_SSL \
 --enable-modules=all --enable-mods-shared=all \
---enable-authn-dbm --enable-authn-anon --enable-authn-dbd \
+--enable-v4-mapped --enable-authn-dbm --enable-authn-anon --enable-authn-dbd \
 --enable-authn-alias --enable-authz-dbm --enable-authz-owner \
 --enable-auth-digest --enable-file-cache \
 --enable-cache --enable-disk-cache --enable-mem-cache \
---enable-dbd --enable-echo --enable-ldap --enable-deflate \
---enable-mime-magic --enable-http --enable-dav --enable-info \
+--enable-dbd --enable-echo --enable-ldap --enable-authnz-ldap \
+--enable-deflate --enable-mime-magic --enable-http --enable-dav --enable-info \
 --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
 --enable-vhost-alias --enable-rewrite --enable-so \
 --with-mpm=prefork --enable-proxy --enable-proxy-connect \
 --enable-proxy-ftp --enable-proxy-http --enable-ssl --enable-static-htpasswd 
-
-#--with-ldap --enable-authnz-ldap
---enable-auth-dbm  --enable-auth-digest \
---enable-dav --enable-dav-fs --enable-deflate --enable-disk-cache \
---enable-info --enable-mem-cache --enable-proxy --enable-rewrite \
---enable-ssl --enable-usertrack --enable-vhost-alias \
---enable-static-htpasswd --enable-static-ab \
---enable-mods-shared=all --with-gdbm=$PREFIX_SUPPORT \
---with-mpm=prefork
 
 make
 sudo make install
@@ -104,7 +95,7 @@ sudo make install
 Change the User and Group in httpd.conf that the webserver will run as to the
 user/group you created at the top of this file.
 
-PHP 5.1.x (http://www.php.net/download)
+PHP 5.2.x (http://www.php.net/download)
 ---------------------------------------
 Since PHP disables 'register_globals' by default, if you have an application
 that uses global variables (variables read in from the HTTP server environment
@@ -132,7 +123,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 # added kerberos support cause c-client Debian package wants it (03Mar2005)
 # copy out the file mm.h to /usr/local/include so that PHP can find it
 
-./configure --prefix=$PREFIX/php-5.1.5 --with-apxs2=$PREFIX/bin/apxs \
+./configure --prefix=$PREFIX/php-5.2.0 --with-apxs2=$PREFIX/bin/apxs \
 --with-config-file-path=$PREFIX/conf \
 --with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
 --with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
@@ -144,34 +135,6 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 --enable-trans-sid --enable-track-var --with-imap-ssl \
 --with-jpeg-dir=$PREFIX_SUPPORT --with-png-dir=$PREFIX_SUPPORT --enable-exif \
 --with-mm=$PREFIX --disable-short-tags 
-
-make
-sudo make install
-
-PHP 4.4.4 (http://www.php.net/download)
----------------------------------------
-Used for PHPWiki on observer.  Dirty black magick.  Both PHP4 and PHP5 are
-installed for one Apache binary, but the config files determine which PHP
-module is used for a specific running copy of apache.
-
-*** WARNING *** 
-
-Make sure you have different configuration/log files for each copy of Apache
-you run on the same machine.  Failure to heed this warning *will* cause
-unpredictable results.  *YOU* *HAVE* *BEEN* *WARNED*.
-
-./configure  --prefix=$PREFIX/php-4.4.4 \
---with-apxs2=$PREFIX/bin/apxs \
---with-config-file-path=/etc/apache-wiki \
---with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
---with-pgsql=/usr --with-mysql=/usr --with-xpm-dir=/usr/X11R6 \
---with-mm=$PREFIX --with-zlib --with-gettext \
---with-zlib-dir=/usr/lib  --with-xml  --with-gdbm \
---with-openssl=$PREFIX_SSL --enable-sysvsem  --enable-sysvshm \
---enable-force-cgi-redirect --enable-calendar \
---enable-inline-optimization  --enable-trans-sid \
---enable-track-vars --with-jpeg-dir=$PREFIX_SUPPORT \
---with-png-dir=$PREFIX_SUPPORT --with-xpm-dir=/usr/X11R6/lib
 
 make
 sudo make install
