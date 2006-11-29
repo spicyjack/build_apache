@@ -82,7 +82,7 @@ compile options you can set in Apache, use './configure --help'
 --enable-authn-alias --enable-authz-dbm --enable-authz-owner \
 --enable-auth-digest --enable-file-cache \
 --enable-cache --enable-disk-cache --enable-mem-cache \
---enable-dbd --enable-echo --enable-ldap --enable-authnz-ldap \
+--enable-dbd --enable-echo \
 --enable-deflate --enable-mime-magic --enable-http --enable-dav --enable-info \
 --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
 --enable-vhost-alias --enable-rewrite --enable-so \
