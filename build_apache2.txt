@@ -124,7 +124,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 # copy out the file mm.h to /usr/local/include so that PHP can find it
 
 ./configure --prefix=$PREFIX/php-5.2.0 --with-apxs2=$PREFIX/bin/apxs \
---with-config-file-path=/etc/httpd \
+--with-config-file-path=/etc/httpd --with-config-file-scan-dir=/etc/httpd \
 --with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
 --with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sqlite-utf8 --with-pgsql --with-zlib-dir=$PREFIX_SUPPORT \
