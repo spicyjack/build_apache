@@ -134,7 +134,7 @@ Built with Ming, MySQL and PostgreSQL, and GD drivers
 --enable-calendar --enable-inline-optimization \
 --enable-trans-sid --enable-track-var --with-imap-ssl \
 --with-jpeg-dir=$PREFIX_SUPPORT --with-png-dir=$PREFIX_SUPPORT --enable-exif \
---with-mm=$PREFIX --disable-short-tags 
+--with-mm=$PREFIX --disable-short-tags --enable-sockets
 
 make
 sudo make install
