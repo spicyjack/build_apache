@@ -201,8 +201,8 @@ apachetmp   /var/lib/apache tmpfs size=8M
 OS X users can use the 'hdid' command to create a ramdisk.  See the hdid
 manpage for more information.
 
-Generating SSL certificates
-===========================
+Generating SSL certificates for signing by a CA
+===============================================
 For the initial SSL cert generation, you can use 'make certificate type=CUSTOM'
 inside of Apache.  This will generate both the custom Certificate Authority
 (CA) certificate (ca.crt) , and the server's certificate (server.crt).  Once
@@ -240,6 +240,10 @@ $ openssl rsa -noout -text -in /root/CA/private/cakey.pem
 # key via:
 
 $ openssl rsa -in ca.key -out ca.key.unsecure
+
+Creating a self-signed SSL Cert for testing purposes
+====================================================
+openssl req -new -x509 -nodes -out server.crt -keyout server.key
 
 ### Older (unneeded) instructions; CA.pl does all this stuff now
 # Create a RSA private key for your Apache server (will be Triple-DES
