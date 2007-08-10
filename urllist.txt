@@ -1,0 +1,12 @@
+# last updated 10Aug2007 for httpd-2007Q2
+# download the files listed below with:
+# for X in $(cat urllist.txt  | grep -v "^#"); do wget $X; done
+http://apache.mirrors.tds.net/httpd/httpd-2.2.4.tar.bz2
+http://apache.mirrors.tds.net/tomcat/tomcat-6/v6.0.14/bin/apache-tomcat-6.0.14-fulldocs.tar.gz
+http://apache.mirrors.tds.net/tomcat/tomcat-6/v6.0.14/bin/apache-tomcat-6.0.14-deployer.tar.gz
+http://apache.mirrors.tds.net/tomcat/tomcat-6/v6.0.14/bin/apache-tomcat-6.0.14.tar.gz
+http://apache.mirrors.tds.net/perl/mod_perl-2.0.3.tar.gz
+http://www.lighttpd.net/download/lighttpd-1.4.16.tar.bz2
+http://us3.php.net/get/php-5.2.3.tar.bz2/from/us2.php.net/mirror
+http://www.openssl.org/source/openssl-0.9.8e.tar.gz
+ftp://ftp.ossp.org/pkg/lib/mm/mm-1.4.2.tar.gz
