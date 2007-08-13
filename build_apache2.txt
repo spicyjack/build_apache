@@ -72,11 +72,12 @@ sudo make install
 
 Apache 2.2.xx (http://httpd.apache.org/download.cgi)
 ----------------------------------------------------
-unpack the tarball, cd into the source directory.  To get a full listing of
-compile options you can set in Apache, use './configure --help'
+Make sure you 'stow' OpenSSL prior to running this step.  Then unpack the
+tarball, cd into the source directory.  To get a full listing of compile
+options you can set in Apache, use './configure --help'
 
 ./configure \
---prefix=$PREFIX --with-ssl=$PREFIX_SSL \
+--prefix=/usr/local/stow/httpd-2.2.4 --with-ssl=/usr/local/bin \
 --enable-modules=all --enable-mods-shared=all \
 --enable-v4-mapped --enable-authn-dbm --enable-authn-anon --enable-authn-dbd \
 --enable-authn-alias --enable-authz-dbm --enable-authz-owner \
