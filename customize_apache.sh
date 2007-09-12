@@ -19,3 +19,6 @@ CFG_DIR=$ROOT_DIR/apache2.2-conf
 # - $APACHE_DIR/bin/envvars to $CFG_DIR, with a link back to the original
 # - $APACHE_DIR/bin/apachectl to $CFG_DIR, with a link back to the original
 # - $CFG_DIR/apachectl to /etc/init.d/httpd
+# for each of the symlinks/moves above, verify that the action has not already
+# taken place; if the action has already taken place, only perform that action
+# if '--force' is specified on the command line
