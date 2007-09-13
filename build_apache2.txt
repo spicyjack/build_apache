@@ -52,7 +52,9 @@ Is the information correct? [y/n] y
 
 MM (http://www.ossp.org/pkg/lib/mm/#tarballs)
 -----------------------------------------------
-NOTE: Apache doesn't seem to use this anymore. PHP can use it still though.
+NOTE: Apache doesn't use this anymore. PHP can use it as long as you're using a
+non-threaded build of PHP.  The PHP build will exit with an error if you try to
+include mm in a threaded build of PHP.
 
 ./configure --prefix=$PREFIX --disable-static
 make
