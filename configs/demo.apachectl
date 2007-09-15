@@ -59,6 +59,7 @@ LYNX="lynx -dump"
 #
 # the URL to your server's mod_status status page.  If you do not
 # have one, then status and fullstatus will not work.
+# FIXME each server will need it's own status URL now
 STATUSURL="http://localhost:8888/server-status"
 #
 # Set this variable to a command that increases the maximum
@@ -82,7 +83,11 @@ fi
 case $ARGV in
 start|stop|restart|graceful|graceful-stop)
     for CFG in $(echo $CONFIGS); do
-        $HTTPD -k $ARGV
+        # -k is 'kommand'
+        echo -n "executing 'httpd';"
+        echo -n "command: $ARGV;"
+        echo "config file: $CFG"
+        $HTTPD -f $CFG_DIR/$CFG -k $ARGV
         ERROR=$?
         if [ $ERROR -gt 0 ]; then
             echo "ERROR: config $CFG exited with error code $ERROR"
