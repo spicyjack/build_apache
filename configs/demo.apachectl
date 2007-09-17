@@ -49,7 +49,8 @@ if test -f $CFG_DIR/envvars; then
   . $CFG_DIR/envvars
 fi
 # a list of Apache configuration files to enumerate over
-CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
+#CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
+CONFIGS="httpd-perl.conf httpd-php.conf"
 
 #
 # a command that outputs a formatted text version of the HTML at the
@@ -84,9 +85,9 @@ case $ARGV in
 start|stop|restart|graceful|graceful-stop)
     for CFG in $(echo $CONFIGS); do
         # -k is 'kommand'
-        echo -n "executing 'httpd';"
-        echo -n "command: $ARGV;"
-        echo "config file: $CFG"
+        echo -n "executing 'httpd'; "
+        echo -n "command: '$ARGV'; "
+        echo "config file: '$CFG'"
         $HTTPD -f $CFG_DIR/$CFG -k $ARGV
         ERROR=$?
         if [ $ERROR -gt 0 ]; then
