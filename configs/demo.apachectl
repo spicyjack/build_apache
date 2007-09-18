@@ -103,8 +103,17 @@ startssl|sslstart|start-SSL)
     ERROR=2
     ;;
 configtest)
-    $HTTPD -t
-    ERROR=$?
+    for CFG in $(echo $CONFIGS); do
+        # -k is 'kommand'
+        echo -n "executing 'httpd -t'; "
+        echo "config file: '$CFG'"
+        $HTTPD -f $CFG_DIR/$CFG -t
+        ERROR=$?
+        if [ $ERROR -gt 0 ]; then
+            echo "ERROR: config $CFG exited with error code $ERROR"
+            exit $ERROR
+        fi
+    done
     ;;
 status)
     $LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
