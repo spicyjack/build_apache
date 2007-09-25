@@ -50,7 +50,7 @@ if test -f $CFG_DIR/envvars; then
 fi
 # a list of Apache configuration files to enumerate over
 #CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
-CONFIGS="httpd-perl.conf httpd-php.conf"
+CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
 
 #
 # a command that outputs a formatted text version of the HTML at the
@@ -116,10 +116,14 @@ configtest)
     done
     ;;
 status)
-    $LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
+    #$LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
+    echo "Disabled for now.... sorry!"
+    exit 1
     ;;
 fullstatus)
-    $LYNX $STATUSURL
+    #$LYNX $STATUSURL
+    echo "Disabled for now.... sorry!"
+    exit 1
     ;;
 *)
     $HTTPD $ARGV
