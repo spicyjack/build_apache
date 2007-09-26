@@ -1,57 +1,108 @@
 #!/bin/sh
 #
-# script to start/stop multiple copies of Apache at once, or individually as
-# specified on the command line
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
 #
-# based on:
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+#
 # Apache control script designed to allow an easy command line interface
 # to controlling Apache.  Written by Marc Slemko, 1997/08/23
 # 
-
-#
 # |||||||||||||||||||| START CONFIGURATION SECTION  ||||||||||||||||||||
 # --------------------                              --------------------
-# 
-# the path to the apachectl script and configuration file directory
-# respectively
-CFG_DIR='/etc/httpd'
-APACHECTL="${CFG_DIR}/apachectl"
+ 
+# common program locations
+GREP='/bin/grep'
+AWK='/usr/bin/awk'
+TR='/usr/bin/tr'
 
-# a list of Apache configuration files to enumerate over
-ALL_CONFIGS="perl php java"
+# the path to your httpd binary, including options if necessary
+HTTPD='/usr/local/apache/bin/httpd'
+CFG_DIR='/etc/httpd'
+
+# pick up any necessary environment variables
+if test -f $CFG_DIR/envvars; then
+  . $CFG_DIR/envvars
+fi
+
+# a command that outputs a formatted text version of the HTML at the
+# url given on the command line.  Designed for lynx, however other
+# programs may work.  
+LYNX="lynx -dump"
+
+# a function for obtaining the port the server is running on
+function get_server_port() {
+    return $GREP "Listen" $CFG_DIR/httpd-${1}.conf | $GREP -v "^#" \
+    | $AWK '{print $2;};' | $TR -d '\n'
+} # function get_server_port
+
+# the URL to your server's mod_status status page.  If you do not
+# have one, then status and fullstatus will not work.
+function get_status_url() {
+    STATUSURL="http://localhost:${1}/server-status"
+} # function get_status_url()
+
+# critical for configurations that use many file descriptors,
+# such as mass vhosting, or a multithreaded server.
+ULIMIT_MAX_FILES="ulimit -S -n $(ulimit -H -n)"
+# --------------------                              --------------------
+# ||||||||||||||||||||   END CONFIGURATION SECTION  ||||||||||||||||||||
+
+# Set the maximum number of file descriptors allowed per child process.
+if [ "x$ULIMIT_MAX_FILES" != "x" ] ; then
+    $ULIMIT_MAX_FILES
+fi
 
 ERROR=0
-# if no arguments were passed in, set $1 to --help
-if [ "x$1" = "x" ] ; then 
-    $1="-h"
-fi
 
-if [ "x$2" = "x" ]; then
-    echo "Hmmm.  The script doesn't know which server to administer"
-    echo "(Hint: pass the name of the server you wish to send commands to"
-    echo "as the second argument to this script)"
-    echo "Example: sh httpd stop plain"
+# see which config we're going to use
+if [ ! -f $CFG_DIR/httpd-$2.conf ]; then
+    echo "ERROR: can't find config file '${CFG_DIR}/httpd-${2}.conf"
     exit 1
 fi
-# the first argument should be action to perform...
-# the second argument is the name of the server to start/stop
-# special case is the keyword 'all', which will loop across all of the servers
-# and perform the action specified by argument #1
+
+# see what action we're going to perform
 case $1 in
-start|stop|restart|graceful|graceful-stop|configtest|ct|test)
-    if [ "x$2" == "xall" -o "x$2" == "xALL" ]; then
-        CONFIGS=$ALL_CONFIGS
+start|stop|restart|graceful|graceful-stop)
+    $HTTPD -f $CFG_DIR/httpd-$2.conf -k $1
+    ERROR=$?
+    if [ $ERROR -gt 0 ]; then
+        echo "ERROR: Starting Apache with config '${2}'"
+        echo "ERROR: exited with error code $ERROR"
+        exit $ERROR
     fi
-    for CFG in $(echo $CONFIGS); do
-        echo "executing 'apachectl ${1} ${CFG}'; "
-        $APACHECTL $1 $CFG
-        ERROR=$?
-        if [ $ERROR -gt 0 ]; then
-            echo "ERROR: apachectl $CFG exited with error code $ERROR"
-            exit $ERROR
-        fi
-    done
     ;;
+configtest)
+    $HTTPD -f $CFG_DIR/httpd-$2.conf -t
+    ERROR=$?
+    if [ $ERROR -gt 0 ]; then
+        echo "ERROR: config $CFG exited with error code $ERROR"
+        exit $ERROR
+    fi
+    ;;
+status)
+    URL= get_status_url(get_server_port($2))
+    echo "status URL is $URL"
+    #$LYNX $STATUSURL | $AWK ' /process$/ { print; exit } { print } '
+    ;;
+fullstatus)
+    get_status_url(get_server_port($2))
+    $LYNX $STATUSURL
+    ;;
+*)
+    echo "ERROR: don't understand command ${1}"
+    exit 1
 esac
 
 exit $ERROR

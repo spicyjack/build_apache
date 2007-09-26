@@ -15,10 +15,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
 # Apache control script designed to allow an easy command line interface
 # to controlling Apache.  Written by Marc Slemko, 1997/08/23
 # 
+# When multiple arguments are given, only the error from the _last_
+# one is reported.  Run "apachectl help" for usage info
+#
+ARGV="$@"
+#
 # |||||||||||||||||||| START CONFIGURATION SECTION  ||||||||||||||||||||
 # --------------------                              --------------------
 # 
@@ -30,7 +34,12 @@ CFG_DIR='/etc/httpd'
 if test -f $CFG_DIR/envvars; then
   . $CFG_DIR/envvars
 fi
+# a list of Apache configuration files to enumerate over
+#CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
+CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
 
+# Set this variable to a command that increases the maximum
+# number of file descriptors allowed per child process. This is
 # critical for configurations that use many file descriptors,
 # such as mass vhosting, or a multithreaded server.
 ULIMIT_MAX_FILES="ulimit -S -n $(ulimit -H -n)"
@@ -43,45 +52,46 @@ if [ "x$ULIMIT_MAX_FILES" != "x" ] ; then
 fi
 
 ERROR=0
-
-# see which config we're going to use
-if [ ! -f $CFG_DIR/httpd-$2.conf ]; then
-    echo "ERROR: can't find config file '${CFG_DIR}/httpd-${2}.conf"
-    exit 1
+if [ "x$ARGV" = "x" ] ; then 
+    ARGV="-h"
 fi
 
-# see what action we're going to perform
-case $1 in
+case $ARGV in
 start|stop|restart|graceful|graceful-stop)
-    $HTTPD -f $CFG_DIR/httpd-$2.conf -k $1
-    ERROR=$?
-    if [ $ERROR -gt 0 ]; then
-        echo "ERROR: Starting Apache with config '${2}'"
-        echo "ERROR: exited with error code $ERROR"
-        exit $ERROR
-    fi
+    for CFG in $(echo $CONFIGS); do
+        # -k is 'kommand'
+        echo -n "executing 'httpd'; "
+        echo -n "command: '$ARGV'; "
+        echo "config file: '$CFG'"
+        $HTTPD -f $CFG_DIR/$CFG -k $ARGV
+        ERROR=$?
+        if [ $ERROR -gt 0 ]; then
+            echo "ERROR: config $CFG exited with error code $ERROR"
+            exit $ERROR
+        fi
+    done
     ;;
 configtest)
-    $HTTPD -f $CFG_DIR/httpd-$2.conf -t
-    ERROR=$?
-    if [ $ERROR -gt 0 ]; then
-        echo "ERROR: config $CFG exited with error code $ERROR"
-        exit $ERROR
-    fi
+    for CFG in $(echo $CONFIGS); do
+        # -k is 'kommand'
+        echo -n "executing 'httpd -t'; "
+        echo "config file: '$CFG'"
+        $HTTPD -f $CFG_DIR/$CFG -t
+        ERROR=$?
+        if [ $ERROR -gt 0 ]; then
+            echo "ERROR: config $CFG exited with error code $ERROR"
+            exit $ERROR
+        fi
+    done
     ;;
-status)
-    #$LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
-    echo "Disabled for now.... sorry!"
-    exit 1
-    ;;
-fullstatus)
-    #$LYNX $STATUSURL
-    echo "Disabled for now.... sorry!"
-    exit 1
+status|quickstatus)
+    # grab the running HTTP processes
+     ps auxw | grep -E "httpd|USER" | grep -E "root|USER" | grep -v grep \
+        | awk '{print $1, $2, $11, $12, $13, $14, $15;}'
     ;;
 *)
-    echo "ERROR: don't understand command ${1}"
-    exit 1
+    $HTTPD $ARGV
+    ERROR=$?
 esac
 
 exit $ERROR
