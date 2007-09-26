@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# script to start/stop multiple copies of Apache at once, or individually as
+# specified on the command line
+#
+# based on:
+# Apache control script designed to allow an easy command line interface
+# to controlling Apache.  Written by Marc Slemko, 1997/08/23
+# 
+
+#
+# |||||||||||||||||||| START CONFIGURATION SECTION  ||||||||||||||||||||
+# --------------------                              --------------------
+# 
+# the path to the apachectl script and configuration file directory
+# respectively
+CFG_DIR='/etc/httpd'
+APACHECTL="${CFG_DIR}/apachectl"
+
+# a list of Apache configuration files to enumerate over
+ALL_CONFIGS="perl php java"
+
+ERROR=0
+# if no arguments were passed in, set $1 to --help
+if [ "x$1" = "x" ] ; then 
+    $1="-h"
+fi
+
+if [ "x$2" = "x" ]; then
+    echo "Hmmm.  The script doesn't know which server to administer"
+    echo "(Hint: pass the name of the server you wish to send commands to"
+    echo "as the second argument to this script)"
+    echo "Example: sh httpd stop plain"
+    exit 1
+fi
+# the first argument should be action to perform...
+# the second argument is the name of the server to start/stop
+# special case is the keyword 'all', which will loop across all of the servers
+# and perform the action specified by argument #1
+case $1 in
+start|stop|restart|graceful|graceful-stop|configtest|ct|test)
+    if [ "x$2" == "xall" -o "x$2" == "xALL" ]; then
+        CONFIGS=$ALL_CONFIGS
+    fi
+    for CFG in $(echo $CONFIGS); do
+        echo "executing 'apachectl ${1} ${CFG}'; "
+        $APACHECTL $1 $CFG
+        ERROR=$?
+        if [ $ERROR -gt 0 ]; then
+            echo "ERROR: apachectl $CFG exited with error code $ERROR"
+            exit $ERROR
+        fi
+    done
+    ;;
+esac
+
+exit $ERROR
+
+# vim: filetype=sh

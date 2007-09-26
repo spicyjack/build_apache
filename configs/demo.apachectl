@@ -19,24 +19,6 @@
 # Apache control script designed to allow an easy command line interface
 # to controlling Apache.  Written by Marc Slemko, 1997/08/23
 # 
-# The exit codes returned are:
-#   XXX this doc is no longer correct now that the interesting
-#   XXX functions are handled by httpd
-#	0 - operation completed successfully
-#	1 - 
-#	2 - usage error
-#	3 - httpd could not be started
-#	4 - httpd could not be stopped
-#	5 - httpd could not be started during a restart
-#	6 - httpd could not be restarted during a restart
-#	7 - httpd could not be restarted during a graceful restart
-#	8 - configuration syntax error
-#
-# When multiple arguments are given, only the error from the _last_
-# one is reported.  Run "apachectl help" for usage info
-#
-ARGV="$@"
-#
 # |||||||||||||||||||| START CONFIGURATION SECTION  ||||||||||||||||||||
 # --------------------                              --------------------
 # 
@@ -48,23 +30,7 @@ CFG_DIR='/etc/httpd'
 if test -f $CFG_DIR/envvars; then
   . $CFG_DIR/envvars
 fi
-# a list of Apache configuration files to enumerate over
-#CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
-CONFIGS="httpd-perl.conf httpd-php.conf httpd-java.conf"
 
-#
-# a command that outputs a formatted text version of the HTML at the
-# url given on the command line.  Designed for lynx, however other
-# programs may work.  
-LYNX="lynx -dump"
-#
-# the URL to your server's mod_status status page.  If you do not
-# have one, then status and fullstatus will not work.
-# FIXME each server will need it's own status URL now
-STATUSURL="http://localhost:8888/server-status"
-#
-# Set this variable to a command that increases the maximum
-# number of file descriptors allowed per child process. This is
 # critical for configurations that use many file descriptors,
 # such as mass vhosting, or a multithreaded server.
 ULIMIT_MAX_FILES="ulimit -S -n $(ulimit -H -n)"
@@ -77,43 +43,31 @@ if [ "x$ULIMIT_MAX_FILES" != "x" ] ; then
 fi
 
 ERROR=0
-if [ "x$ARGV" = "x" ] ; then 
-    ARGV="-h"
+
+# see which config we're going to use
+if [ ! -f $CFG_DIR/httpd-$2.conf ]; then
+    echo "ERROR: can't find config file '${CFG_DIR}/httpd-${2}.conf"
+    exit 1
 fi
 
-case $ARGV in
+# see what action we're going to perform
+case $1 in
 start|stop|restart|graceful|graceful-stop)
-    for CFG in $(echo $CONFIGS); do
-        # -k is 'kommand'
-        echo -n "executing 'httpd'; "
-        echo -n "command: '$ARGV'; "
-        echo "config file: '$CFG'"
-        $HTTPD -f $CFG_DIR/$CFG -k $ARGV
-        ERROR=$?
-        if [ $ERROR -gt 0 ]; then
-            echo "ERROR: config $CFG exited with error code $ERROR"
-            exit $ERROR
-        fi
-    done
-    ;;
-startssl|sslstart|start-SSL)
-    echo The startssl option is no longer supported.
-    echo Please edit httpd.conf to include the SSL configuration settings
-    echo and then use "apachectl start".
-    ERROR=2
+    $HTTPD -f $CFG_DIR/httpd-$2.conf -k $1
+    ERROR=$?
+    if [ $ERROR -gt 0 ]; then
+        echo "ERROR: Starting Apache with config '${2}'"
+        echo "ERROR: exited with error code $ERROR"
+        exit $ERROR
+    fi
     ;;
 configtest)
-    for CFG in $(echo $CONFIGS); do
-        # -k is 'kommand'
-        echo -n "executing 'httpd -t'; "
-        echo "config file: '$CFG'"
-        $HTTPD -f $CFG_DIR/$CFG -t
-        ERROR=$?
-        if [ $ERROR -gt 0 ]; then
-            echo "ERROR: config $CFG exited with error code $ERROR"
-            exit $ERROR
-        fi
-    done
+    $HTTPD -f $CFG_DIR/httpd-$2.conf -t
+    ERROR=$?
+    if [ $ERROR -gt 0 ]; then
+        echo "ERROR: config $CFG exited with error code $ERROR"
+        exit $ERROR
+    fi
     ;;
 status)
     #$LYNX $STATUSURL | awk ' /process$/ { print; exit } { print } '
@@ -126,8 +80,8 @@ fullstatus)
     exit 1
     ;;
 *)
-    $HTTPD $ARGV
-    ERROR=$?
+    echo "ERROR: don't understand command ${1}"
+    exit 1
 esac
 
 exit $ERROR
