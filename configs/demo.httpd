@@ -43,8 +43,8 @@ LYNX="lynx -dump"
 
 # a function for obtaining the port the server is running on
 function get_server_port() {
-    return $GREP "Listen" $CFG_DIR/httpd-${1}.conf | $GREP -v "^#" \
-    | $AWK '{print $2;};' | $TR -d '\n'
+    SERVER_PORT=$($GREP "Listen" $CFG_DIR/httpd-${1}.conf | $GREP -v "^#" \
+    | $AWK '{print $2;};' | $TR -d '\n')
 } # function get_server_port
 
 # the URL to your server's mod_status status page.  If you do not
@@ -92,12 +92,17 @@ configtest)
     fi
     ;;
 status)
-    URL= get_status_url(get_server_port($2))
-    echo "status URL is $URL"
-    #$LYNX $STATUSURL | $AWK ' /process$/ { print; exit } { print } '
+    # sets $SERVER_PORT globally
+    get_server_port $2
+    # sets $STATUSURL globally
+    get_status_url $SERVER_PORT
+    $LYNX $STATUSURL | $AWK ' /process$/ { print; exit } { print } '
     ;;
 fullstatus)
-    get_status_url(get_server_port($2))
+    # sets $SERVER_PORT globally
+    get_server_port $2
+    # sets $STATUSURL globally
+    get_status_url $SERVER_PORT
     $LYNX $STATUSURL
     ;;
 *)
