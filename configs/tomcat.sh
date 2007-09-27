@@ -45,6 +45,7 @@ CLASSPATH=$JAVA_HOME/lib/tools.jar
 CLASSPATH=$CATALINA_HOME/bin/commons-daemon.jar:$CLASSPATH
 CLASSPATH=$CATALINA_HOME/bin/bootstrap.jar:$CLASSPATH
 
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/lib"
 case "$1" in
   start)
     #
