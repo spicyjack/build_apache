@@ -118,27 +118,21 @@ thename of the C source file that contains the above string.  Place the
 filename of that C source file in the IfModule directive above, and Apache will
 then tell PHP to honor the directive for that directory. 
 
-Built with Ming, MySQL and PostgreSQL, and GD drivers
-
 # need zlib headers
 # need gdbm headers
 # need postresql-dev package, which has header files
-# added kerberos support cause c-client Debian package wants it (03Mar2005)
-# copy out the file mm.h to /usr/local/include so that PHP can find it
 
-./configure --prefix=$PREFIX/php-5.2.0 --with-apxs2=$PREFIX/bin/apxs \
---with-config-file-path=/etc/httpd --with-config-file-scan-dir=/etc/httpd \
---with-gd --enable-gd-imgstrttf --with-freetype-dir=$PREFIX_SUPPORT \
---with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
---enable-sqlite-utf8 --with-pgsql --with-zlib-dir=$PREFIX_SUPPORT \
---with-xml --with-pear --with-openssl=$PREFIX_SSL \
---with-gdbm --with-xpm-dir=/usr/X11R6 --with-gettext=$PREFIX_SSL \
---enable-sysvsem --enable-sysvshm --enable-force-cgi-redirect \
---enable-calendar --enable-inline-optimization \
---enable-trans-sid --enable-track-var --with-imap-ssl \
---with-jpeg-dir=$PREFIX_SUPPORT --with-png-dir=$PREFIX_SUPPORT --enable-exif \
---with-mm=$PREFIX --disable-short-tags --enable-sockets
-
+./configure --prefix=$PREFIX/php-5.2.X --with-apxs2=$PREFIX/bin/apxs \
+--with-config-file-path=/usr/local/httpd/conf \
+--with-config-file-scan-dir=/usr/local/httpd/conf --with-gd \
+--with-freetype-dir=$PREFIX_SUPPORT --with-mysql=$PREFIX_SUPPORT \
+--with-mysql-sock=/var/run/mysqld/mysqld.sock --enable-sqlite-utf8 \
+--with-zlib-dir=$PREFIX_SUPPORT --with-pear --with-openssl=$PREFIX_SSL \
+--with-gdbm --with-gettext=$PREFIX_SSL --enable-sysvsem --enable-sysvshm \
+--enable-force-cgi-redirect --enable-calendar --enable-inline-optimization \
+--with-imap-ssl --with-jpeg-dir=$PREFIX_SUPPORT \
+--with-png-dir=$PREFIX_SUPPORT --enable-exif --disable-short-tags \
+--enable-sockets --with-mcrypt=$PREFIX_SUPPORT
 make
 sudo make install
 
