@@ -8,7 +8,7 @@ export PREFIX=/export/home/apache-2.2.xx (where xx is the version you are
 compiling)
 
 for Debian Linux:
-export PREFIX=/usr/local/apache-2.2.xx
+export PREFIX=/usr/local/stow
 export PREFIX_SSL=$PREFIX
 export PREFIX_SUPPORT=/usr/lib
 
@@ -56,14 +56,14 @@ NOTE: Apache doesn't use this anymore. PHP can use it as long as you're using a
 non-threaded build of PHP.  The PHP build will exit with an error if you try to
 include mm in a threaded build of PHP.
 
-./configure --prefix=$PREFIX --disable-static
+./configure --prefix=$PREFIX/mm-1.X --disable-static
 make
 make test (or 'time make test')
 sudo make install
 
 OpenSSL 0.9.8x (http://www.openssl.org/source/)
 -----------------------------------------------
-./config --prefix=$PREFIX shared
+./config --prefix=$PREFIX/openssl-0.9.8X shared
 
 The 'shared' statement will make OpenSSL build shared libraries.  You want
 this (see e-mail thread at the bottom of this file).
@@ -74,19 +74,40 @@ sudo make install
 
 Apache 2.2.xx (http://httpd.apache.org/download.cgi)
 ----------------------------------------------------
+Setup:
+
+To build LDAP into Apache, the APR tool needs to be built first, and built so
+that it's LDAP-aware.  See
+http://brent.kearneys.ca/2006/12/10/building-ldap-authentication-into-apache2/
+for more info and the hows and whys.
+
+cd srclib/apr
+make clean
+./configure --prefix=$PREFIX/httpd-2.2.X --enable-threads \
+--enable-other-child
+make
+
+cd ../apr-util
+make clean
+./configure --prefix=$PREFIX/httpd-2.2.X --with-apr=../apr \
+--with-ldap-lib=/usr/lib --with-ldap-include=/usr/include \
+--with-ldap=ldap
+make
+
 Make sure you 'stow' OpenSSL prior to running this step.  Then unpack the
 tarball, cd into the source directory.  To get a full listing of compile
-options you can set in Apache, use './configure --help'
+options you can set in Apache, use './configure --help'.
 
 ./configure \
---prefix=/usr/local/stow/httpd-2.2.4 --with-ssl=/usr/local \
+--prefix=/usr/local/stow/httpd-2.2.14 --with-ssl=/usr/local \
 --enable-modules=all --enable-mods-shared=all \
---enable-v4-mapped --enable-authn-dbm --enable-authn-anon --enable-authn-dbd \
---enable-authn-alias --enable-authz-dbm --enable-authz-owner \
---enable-auth-digest --enable-file-cache \
---enable-cache --enable-disk-cache --enable-mem-cache \
---enable-dbd --enable-echo \
---enable-deflate --enable-mime-magic --enable-http --enable-dav --enable-info \
+--enable-v4-mapped --enable-authn-dbm --enable-authn-anon \
+--enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
+--enable-authz-owner --enable-auth-digest --enable-authnz-ldap \
+--enable-ldap \
+--enable-file-cache --enable-cache --enable-disk-cache --enable-mem-cache \
+--enable-dbd --enable-echo --enable-deflate --enable-mime-magic \
+--enable-http --enable-dav --enable-info \
 --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
 --enable-vhost-alias --enable-rewrite --enable-so \
 --with-mpm=prefork --enable-proxy --enable-proxy-connect \
@@ -118,16 +139,16 @@ thename of the C source file that contains the above string.  Place the
 filename of that C source file in the IfModule directive above, and Apache will
 then tell PHP to honor the directive for that directory. 
 
-# need zlib headers
-# need gdbm headers
-# need postresql-dev package, which has header files
+# need: zlib-dev gdbm-dev postgresql-dev mysql-dev libxml2-dev
+# libjpeg-dev libpng-dev libfreetype6-dev libmcrypt-dev libmcrypt4
+# stow apache and openssl prior to running ./configure for php
 
-./configure --prefix=$PREFIX/php-5.2.X --with-apxs2=$PREFIX/bin/apxs \
---with-config-file-path=/usr/local/httpd/conf \
---with-config-file-scan-dir=/usr/local/httpd/conf --with-gd \
+./configure --prefix=$PREFIX/php-5.2.X --with-apxs2=/usr/local/bin/apxs \
+--with-config-file-path=/etc/httpd \
+--with-config-file-scan-dir=/etc/httpd --with-gd \
 --with-freetype-dir=$PREFIX_SUPPORT --with-mysql=$PREFIX_SUPPORT \
 --with-mysql-sock=/var/run/mysqld/mysqld.sock --enable-sqlite-utf8 \
---with-zlib-dir=$PREFIX_SUPPORT --with-pear --with-openssl=$PREFIX_SSL \
+--with-zlib-dir=$PREFIX_SUPPORT --with-pear --with-openssl=/usr/local \
 --with-gdbm --with-gettext=$PREFIX_SSL --enable-sysvsem --enable-sysvshm \
 --enable-force-cgi-redirect --enable-calendar --enable-inline-optimization \
 --with-imap-ssl --with-jpeg-dir=$PREFIX_SUPPORT \
