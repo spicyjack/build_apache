@@ -42,6 +42,10 @@ time make
 LD_LIBRARY_PATH=/usr/local/lib time make test
 make install
 
+Move /usr/local/lib/perl to /usr/local/stow/mod_perl-X.X.X/lib
+Move the files in /usr/local/stow/mod_perl-X.X.X/usr/local etc. back into
+/usr/local/stow/mod_perl-X.X.X (include and modules directories)
+
 Building fake Debian packages using 'equivs'
 --------------------------------------------
 apt-get install equivs
