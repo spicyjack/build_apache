@@ -54,4 +54,6 @@ equivs-build libapache2-mod-perl2
 sudo dpkg -i libapache2-mod-perl2_2.0.4_all.deb
 
 you can use 'dpkg -P' to get a list of packages to build with equivs in order
-to satisfy dependencies for something.
+to satisfy dependencies for something.  Example equivs are stored in:
+
+ssh://hg@hg.portaboom.com/spicyjack/hostcfgs
