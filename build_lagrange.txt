@@ -1,10 +1,10 @@
-OpenSSL 0.9.8h
+OpenSSL 0.9.8l
 --------------
-./config --prefix=$PREFIX/openssl-0.9.8h shared
+./config --prefix=$PREFIX/openssl-0.9.8l shared
 
-Apache 2.2.9
+Apache 2.2.14
 ------------
-./configure --prefix=/usr/local/stow/httpd-2.2.9 --enable-modules=all \
+./configure --prefix=/usr/local/stow/httpd-2.2.14 --enable-modules=all \
 --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
 --enable-authn-anon --enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
 --enable-authz-owner --enable-auth-digest --enable-file-cache --enable-cache \
@@ -15,11 +15,12 @@ Apache 2.2.9
 --enable-proxy --enable-proxy-connect --enable-proxy-ftp --enable-proxy-http \
 --enable-ssl --enable-static-htpasswd --with-ssl=/usr/local
 
-PHP 5.2.6
+PHP 5.2.12
 ---------
 needs libxml2-dev in addition to what the webpage says
+phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 
-./configure --prefix=/usr/local/stow/php-5.2.6 \
+./configure --prefix=/usr/local/stow/php-5.2.12 \
 --with-apxs2=/usr/local/bin/apxs --enable-fastcgi \
 --enable-force-cgi-redirect --with-config-file-path=/etc/httpd \
 --with-config-file-scan-dir=/etc/httpd --with-openssl=/usr/local --with-zlib \
@@ -29,7 +30,7 @@ needs libxml2-dev in addition to what the webpage says
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
 --with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sqlite-utf8 --enable-sysvsem --enable-sysvshm \
---enable-zip --with-pear --with-pdo-mysql
+--enable-zip --with-pear --with-pdo-mysql --with-mcrypt
 
 mod_perl 2.0.4
 --------------
