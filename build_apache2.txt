@@ -61,50 +61,33 @@ make
 make test (or 'time make test')
 sudo make install
 
-OpenSSL 0.9.8x (http://www.openssl.org/source/)
+OpenSSL 1.0.0d (http://www.openssl.org/source/)
 -----------------------------------------------
-./config --prefix=$PREFIX/openssl-0.9.8X shared
+./config --prefix=$PREFIX/openssl-1.0.0d shared
 
-The 'shared' statement will make OpenSSL build shared libraries.  You want
-this (see e-mail thread at the bottom of this file).
+The 'shared' statement will make OpenSSL build shared libraries.  See the
+INSTALL file for why you want this set.
 
 make
 make test (or 'time make test')
 sudo make install
 
-Apache 2.2.xx (http://httpd.apache.org/download.cgi)
+Apache 2.2.14 (http://httpd.apache.org/download.cgi)
 ----------------------------------------------------
 Setup:
 
-To build LDAP into Apache, the APR tool needs to be built first, and built so
-that it's LDAP-aware.  See
-http://brent.kearneys.ca/2006/12/10/building-ldap-authentication-into-apache2/
-for more info and the hows and whys.
-
-cd srclib/apr
-make clean
-./configure --prefix=$PREFIX/httpd-2.2.X --enable-threads \
---enable-other-child
-make
-
-cd ../apr-util
-make clean
-./configure --prefix=$PREFIX/httpd-2.2.X --with-apr=../apr \
---with-ldap-lib=/usr/lib --with-ldap-include=/usr/include \
---with-ldap=ldap
-make
 
 Make sure you 'stow' OpenSSL prior to running this step.  Then unpack the
 tarball, cd into the source directory.  To get a full listing of compile
 options you can set in Apache, use './configure --help'.
 
 ./configure \
---prefix=/usr/local/stow/httpd-2.2.14 --with-ssl=/usr/local \
+--prefix=/usr/local/stow/httpd-2.2.17 --with-ssl=/usr/local \
 --enable-modules=all --enable-mods-shared=all \
 --enable-v4-mapped --enable-authn-dbm --enable-authn-anon \
 --enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
 --enable-authz-owner --enable-auth-digest --enable-authnz-ldap \
---enable-ldap \
+--with-ldap=ldap \
 --enable-file-cache --enable-cache --enable-disk-cache --enable-mem-cache \
 --enable-dbd --enable-echo --enable-deflate --enable-mime-magic \
 --enable-http --enable-dav --enable-info \
@@ -114,6 +97,24 @@ options you can set in Apache, use './configure --help'.
 --enable-proxy-ftp --enable-proxy-http --enable-ssl --enable-static-htpasswd 
 
 make
+
+When the above make bombs out, build the APR tool.  See
+http://brent.kearneys.ca/2006/12/10/building-ldap-authentication-into-apache2/
+for more info and the hows and whys.
+
+cd srclib/apr
+make clean
+./configure --prefix=$PREFIX/httpd-2.2.17 --enable-threads \
+--enable-other-child
+make
+
+cd ../apr-util
+make clean
+./configure --prefix=$PREFIX/httpd-2.2.17 --with-apr=../apr \
+--with-ldap-lib=/usr/lib --with-ldap-include=/usr/include \
+--with-ldap=ldap
+make
+
 sudo make install
 
 Change the User and Group in httpd.conf that the webserver will run as to the
