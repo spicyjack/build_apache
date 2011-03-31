@@ -1,10 +1,10 @@
-OpenSSL 0.9.8l
+OpenSSL 1.0.0d
 --------------
-./config --prefix=$PREFIX/openssl-0.9.8l shared
+./config --prefix=$PREFIX/openssl-1.0.0d shared
 
-Apache 2.2.14
+Apache 2.2.17
 ------------
-./configure --prefix=/usr/local/stow/httpd-2.2.14 --enable-modules=all \
+./configure --prefix=${PREFIX}/httpd-2.2.17 --enable-modules=all \
 --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
 --enable-authn-anon --enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
 --enable-authz-owner --enable-auth-digest --enable-file-cache --enable-cache \
@@ -32,7 +32,7 @@ phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 --enable-sockets --enable-sqlite-utf8 --enable-sysvsem --enable-sysvshm \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt
 
-mod_perl 2.0.4
+mod_perl 2.0.5
 --------------
 Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.5.8.8.  If it doesn't exist, create it as a symlink back to the library file.
 
