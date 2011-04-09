@@ -1,10 +1,13 @@
+export PREFIX=/usr/local/stow/httpd-2.2.17
+export PREFIX_SUPPORT=/usr/lib
+
 OpenSSL 1.0.0d
 --------------
-./config --prefix=$PREFIX/openssl-1.0.0d shared
+./config --prefix=$PREFIX shared
 
 Apache 2.2.17
 ------------
-./configure --prefix=${PREFIX}/httpd-2.2.17 --enable-modules=all \
+./configure --prefix=${PREFIX} --enable-modules=all \
 --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
 --enable-authn-anon --enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
 --enable-authz-owner --enable-auth-digest --enable-file-cache --enable-cache \
@@ -13,24 +16,24 @@ Apache 2.2.17
 --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
 --enable-vhost-alias --enable-rewrite --enable-so --with-mpm=prefork \
 --enable-proxy --enable-proxy-connect --enable-proxy-ftp --enable-proxy-http \
---enable-ssl --enable-static-htpasswd --with-ssl=/usr/local
+--enable-ssl --enable-static-htpasswd --with-ssl=/usr/local \
+--enable-authnz-ldap --with-ldap=ldap --enable-ldap
 
-PHP 5.2.12
+PHP 5.3.6
 ---------
 needs libxml2-dev in addition to what the webpage says
 phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 
-./configure --prefix=/usr/local/stow/php-5.2.12 \
---with-apxs2=/usr/local/bin/apxs --enable-fastcgi \
---enable-force-cgi-redirect --with-config-file-path=/etc/httpd \
---with-config-file-scan-dir=/etc/httpd --with-openssl=/usr/local --with-zlib \
+./configure --prefix=${PREFIX} \
+--with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
+--with-config-file-scan-dir=/etc/httpd --with-openssl=${PREFIX} --with-zlib \
 --with-bz2 --enable-calendar --enable-dba --with-gdbm --enable-exif \
 --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
 --with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sqlite-utf8 --enable-sysvsem --enable-sysvshm \
---enable-zip --with-pear --with-pdo-mysql --with-mcrypt
+--enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring
 
 mod_perl 2.0.5
 --------------
@@ -38,9 +41,9 @@ Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.
 
 The MP_AP_DESTDIR screws things up; haven't figured out a clean way to stow mod_perl yet.
 
-perl Makefile.PL MP_APXS=/usr/local/bin/apxs MP_AP_DESTDIR=/usr/local/stow/mod_perl-2.0.4
+perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs 
 time make
-LD_LIBRARY_PATH=/usr/local/lib time make test
+time LD_LIBRARY_PATH=${PREFIX}/lib make test
 make install
 
 Move /usr/local/lib/perl to /usr/local/stow/mod_perl-X.X.X/lib
