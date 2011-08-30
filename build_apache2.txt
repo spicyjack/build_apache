@@ -72,7 +72,7 @@ make
 make test (or 'time make test')
 sudo make install
 
-Apache 2.2.17 (http://httpd.apache.org/download.cgi)
+Apache 2.2.19 (http://httpd.apache.org/download.cgi)
 ----------------------------------------------------
 Setup:
 
@@ -82,7 +82,7 @@ tarball, cd into the source directory.  To get a full listing of compile
 options you can set in Apache, use './configure --help'.
 
 ./configure \
---prefix=${PREFIX}/httpd-2.2.17 --with-ssl=/usr/local \
+--prefix=${PREFIX}/httpd-2.2.19 --with-ssl=/usr/local \
 --enable-modules=all --enable-mods-shared=all \
 --enable-v4-mapped --enable-authn-dbm --enable-authn-anon \
 --enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
@@ -105,6 +105,24 @@ http://brent.kearneys.ca/2006/12/10/building-ldap-authentication-into-apache2/
 
 Also, if any of the Apache tools from your old Apache build are in your $PATH
 and the new build finds them, mayhem will ensue.
+
+Summary of steps from the above link:
+
+cd srclib/apr
+make clean
+./configure --prefix=${PREFIX} --enable-threads \
+--enable-other-child
+time make
+
+cd ../apr-util
+make clean
+./configure --prefix=${PREFIX} --with-apr=../apr \
+--with-ldap-lib=/opt/local/lib --with-ldap-include=/opt/local/include \
+--with-ldap=ldap
+time make
+
+cd ../..
+time make
 
 Change the User and Group in httpd.conf that the webserver will run as to the
 user/group you created at the top of this file.
@@ -156,7 +174,7 @@ The MP_AP_DESTDIR screws things up; haven't figured out a clean way to stow mod_
 perl yet.
 
 perl Makefile.PL MP_APXS=/usr/local/bin/apxs MP_AP_DESTDIR=/usr/local/stow/mod_p
-erl-2.0.4
+erl-2.0.5
 time make
 LD_LIBRARY_PATH=/usr/local/lib time make test
 make install
