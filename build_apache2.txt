@@ -13,7 +13,7 @@ export PREFIX_SSL=$PREFIX
 export PREFIX_SUPPORT=/usr/lib
 
 for Mac OS X:
-export PREFIX=/usr/local/stow/apache-2.2.xx 
+export PREFIX=/opt/stow
 export PREFIX_SSL=/opt/local/
 export PREFIX_SUPPORT=/opt/local/lib
 
@@ -70,7 +70,7 @@ INSTALL file for why you want this set.
 
 For 64-bit Mac OS X:
 
-./Configure --prefix=/opt/stow/openssl-1.0.0.d darwin64-x86_64-cc shared
+./Configure --prefix=$PREFIX/openssl-1.0.0d-x86_64 darwin64-x86_64-cc shared
 
 make
 make test (or 'time make test')
@@ -79,7 +79,6 @@ sudo make install
 Apache 2.2.19 (http://httpd.apache.org/download.cgi)
 ----------------------------------------------------
 Setup:
-
 
 Make sure you 'stow' OpenSSL prior to running this step.  Then unpack the
 tarball, cd into the source directory.  To get a full listing of compile
@@ -179,8 +178,9 @@ Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.
 The MP_AP_DESTDIR screws things up; haven't figured out a clean way to stow mod_
 perl yet.
 
-perl Makefile.PL MP_APXS=/usr/local/bin/apxs MP_AP_DESTDIR=/usr/local/stow/mod_p
-erl-2.0.5
+perl Makefile.PL \
+    MP_APXS=/usr/local/bin/apxs \
+    MP_AP_DESTDIR=$PREFIX/mod_perl-2.0.5
 time make
 LD_LIBRARY_PATH=/usr/local/lib time make test
 make install
