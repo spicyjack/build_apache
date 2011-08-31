@@ -98,7 +98,8 @@ options you can set in Apache, use './configure --help'.
 --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
 --enable-vhost-alias --enable-rewrite --enable-so \
 --with-mpm=prefork --enable-proxy --enable-proxy-connect \
---enable-proxy-ftp --enable-proxy-http --enable-ssl --enable-static-htpasswd 
+--enable-proxy-ftp --enable-proxy-http --enable-ssl \
+--enable-static-htpasswd --with-included-apr
 
 make
 sudo make install
