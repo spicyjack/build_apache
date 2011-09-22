@@ -268,7 +268,7 @@ $ openssl rsa -noout -text -in newkey.pem
 # And you could create a decrypted PEM version (not recommended) of this RSA
 # private key via:
 
-$ openssl rsa -in newkey.pem -out newkey.pem.unsecure
+$ openssl rsa -in newkey.pem -out newkey.pem.nopass
 
 # sign the CSR with CA.pl
 
