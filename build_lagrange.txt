@@ -1,11 +1,14 @@
-export PREFIX=/usr/local/stow/httpd-2.2.17
+export PREFIX=/usr/local/stow/httpd-2.2.21
 export PREFIX_SUPPORT=/usr/lib
 
-OpenSSL 1.0.0d
+OpenSSL 1.0.0e
 --------------
 ./config --prefix=$PREFIX shared
+time make
+time make test
+sudo make install
 
-Apache 2.2.17
+Apache 2.2.21
 ------------
 ./configure --prefix=${PREFIX} --enable-modules=all \
 --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
@@ -17,9 +20,12 @@ Apache 2.2.17
 --enable-vhost-alias --enable-rewrite --enable-so --with-mpm=prefork \
 --enable-proxy --enable-proxy-connect --enable-proxy-ftp --enable-proxy-http \
 --enable-ssl --enable-static-htpasswd --with-ssl=/usr/local \
---enable-authnz-ldap --with-ldap=ldap --enable-ldap
+--enable-authnz-ldap --with-ldap=ldap --enable-ldap --with-included-apr
 
-PHP 5.3.6
+time make
+sudo make install
+
+PHP 5.3.8
 ---------
 needs libxml2-dev in addition to what the webpage says
 phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
@@ -34,6 +40,9 @@ phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 --with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sqlite-utf8 --enable-sysvsem --enable-sysvshm \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring
+
+time make
+sudo make install
 
 mod_perl 2.0.5
 --------------
