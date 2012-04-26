@@ -1,14 +1,14 @@
 export PREFIX=/usr/local/stow/httpd-2.2.21
 export PREFIX_SUPPORT=/usr/lib
 
-OpenSSL 1.0.0e
+OpenSSL 1.0.0h
 --------------
 ./config --prefix=$PREFIX shared
 time make
 time make test
 sudo make install
 
-Apache 2.2.21
+Apache 2.2.22
 ------------
 ./configure --prefix=${PREFIX} --enable-modules=all \
 --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
@@ -25,7 +25,7 @@ Apache 2.2.21
 time make
 sudo make install
 
-PHP 5.3.8
+PHP 5.4.1
 ---------
 needs libxml2-dev in addition to what the webpage says
 phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
@@ -37,12 +37,17 @@ phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
---with-mysql=$PREFIX_SUPPORT --with-mysql-sock=/var/run/mysqld/mysqld.sock \
---enable-sockets --enable-sqlite-utf8 --enable-sysvsem --enable-sysvshm \
+--with-mysql --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+--enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring
 
 time make
 sudo make install
+
+Install the following extensions for support of OpenPhoto
+- sudo apt-get install libmagick9-dev
+- sudo ./pecl install imagick
+- sudo ./pecl install apc
 
 mod_perl 2.0.5
 --------------
