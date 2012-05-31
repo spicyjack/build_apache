@@ -1,7 +1,7 @@
-export PREFIX=/usr/local/stow/httpd-2.2.21
+export PREFIX=/usr/local/stow/httpd-2.2.22
 export PREFIX_SUPPORT=/usr/lib
 
-OpenSSL 1.0.0h
+OpenSSL 1.0.1c
 --------------
 ./config --prefix=$PREFIX shared
 time make
@@ -53,16 +53,13 @@ mod_perl 2.0.5
 --------------
 Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.5.8.8.  If it doesn't exist, create it as a symlink back to the library file.
 
-The MP_AP_DESTDIR screws things up; haven't figured out a clean way to stow mod_perl yet.
-
 perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs 
 time make
 time LD_LIBRARY_PATH=${PREFIX}/lib make test
 make install
 
-Move /usr/local/lib/perl to /usr/local/stow/mod_perl-X.X.X/lib
-Move the files in /usr/local/stow/mod_perl-X.X.X/usr/local etc. back into
-/usr/local/stow/mod_perl-X.X.X (include and modules directories)
+Move /usr/local/lib/perl to /usr/local/stow/httpd-2.2.XX/lib
+Move /usr/local/man/man3 to /usr/local/stow/httpd-2.2.XX/man
 
 Building fake Debian packages using 'equivs'
 --------------------------------------------
