@@ -129,8 +129,9 @@ thename of the C source file that contains the above string.  Place the
 filename of that C source file in the IfModule directive above, and Apache will
 then tell PHP to honor the directive for that directory. 
 
-# need: zlib-dev gdbm-dev postgresql-dev mysql-dev libxml2-dev
-# libjpeg-dev libpng-dev libfreetype6-dev libmcrypt-dev libmcrypt4
+# need: libjpeg62-dev libpng12-dev libfreetype6-dev libmcrypt-dev libmcrypt4
+# zlib1g-dev libgdbm-dev libpq-dev libmysqlclient-dev libxml2-dev
+#
 # stow apache and openssl prior to running ./configure for php
 
 ./configure --prefix=$PREFIX/php-5.2.X --with-apxs2=/usr/local/bin/apxs \
