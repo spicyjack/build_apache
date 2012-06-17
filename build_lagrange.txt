@@ -1,3 +1,6 @@
+TODO: Install mod_perl on a VM and work with the configuration parameters so
+it will install a stowable copy of itself
+
 export PREFIX=/usr/local/stow/httpd-2.2.22-Jun2012
 export PREFIX_SUPPORT=/usr/lib
 
