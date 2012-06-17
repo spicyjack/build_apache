@@ -69,9 +69,12 @@ Building fake Debian packages using 'equivs'
 apt-get install equivs
 equivs-control libapache2-mod-perl2
 equivs-build libapache2-mod-perl2
-sudo dpkg -i libapache2-mod-perl2_2.0.4_all.deb
+sudo dpkg -i libapache2-mod-perl2_2.0.X_all.deb
 
 you can use 'dpkg -P' to get a list of packages to build with equivs in order
-to satisfy dependencies for something.  Example equivs are stored in:
+to satisfy dependencies for something.  The equivs dummy packages should have
+their version numbers changed when you do a new install of Apache.
 
-ssh://hg@hg.portaboom.com/spicyjack/hostcfgs
+Example equivs are stored in:
+
+ssh://purl443/srv/git/hostcfgs.git
