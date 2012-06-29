@@ -36,6 +36,9 @@ PHP 5.4.1/5.3.14
 needs libxml2-dev in addition to what the webpage says
 phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 
+--with-mysqli is for phpMyAdmin
+--with-mysql is for WordPress
+
 ./configure --prefix=${PREFIX} \
 --with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
 --with-config-file-scan-dir=/etc/httpd --with-openssl=${PREFIX} --with-zlib \
@@ -43,7 +46,7 @@ phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
---with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+--with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring
 
