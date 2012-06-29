@@ -6,7 +6,7 @@ export PREFIX_SUPPORT=/usr/lib
 
 OpenSSL 1.0.1c
 --------------
-./config --prefix=$PREFIX shared
+./config --prefix=$PREFIX shared zlib
 time make
 time make test
 sudo make install
@@ -22,8 +22,11 @@ Apache 2.2.22
 --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
 --enable-vhost-alias --enable-rewrite --enable-so --with-mpm=prefork \
 --enable-proxy --enable-proxy-connect --enable-proxy-ftp --enable-proxy-http \
---enable-ssl --enable-static-htpasswd --with-ssl=/usr/local \
---enable-authnz-ldap --with-ldap=ldap --enable-ldap --with-included-apr
+--enable-ssl --enable-static-htpasswd --with-ssl=${PREFIX} \
+--enable-authnz-ldap --with-ldap=ldap --enable-ldap --with-included-apr \
+--with-expat=/usr
+
+--with-expat=/usr is apparently needed on 64-bit systems.
 
 time make
 sudo make install
@@ -40,7 +43,7 @@ phpMyAdmin wants mcrypt/libmcrypt-dev packages and --enable-mbstring
 --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
---with-mysql --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+--with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring
 
@@ -59,10 +62,21 @@ Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.
 perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs 
 time make
 time LD_LIBRARY_PATH=${PREFIX}/lib make test
-make install
+# if you are running a previous instance of mod_perl under stow, unstow that
+# instance prior to running make install, as mod_perl's make install is stupid
+# and will happily overwrite your existing mod_perl files
+sudo make install
 
 Move /usr/local/lib/perl to /usr/local/stow/httpd-2.2.XX/lib
 Move /usr/local/man/man3 to /usr/local/stow/httpd-2.2.XX/man
+
+Testing
+-------
+- phpinfo.php page
+  - https://shell.xaoc.org/phpMyAdmin/phpinfo.php - requires login first
+- http://purl.xaoc.org/perl-status
+- http://purl.xaoc.org/server-status
+- http://purl.xaoc.org/server-info
 
 Building fake Debian packages using 'equivs'
 --------------------------------------------
