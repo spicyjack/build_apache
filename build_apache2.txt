@@ -70,7 +70,7 @@ INSTALL file for why you want this set.
 
 For 64-bit Mac OS X:
 
-./Configure --prefix=$PREFIX/openssl-1.0.0d-x86_64 darwin64-x86_64-cc shared
+./Configure --prefix=$PREFIX darwin64-x86_64-cc shared zlib
 
 make
 make test (or 'time make test')
