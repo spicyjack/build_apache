@@ -40,6 +40,8 @@ Requirements:
     libqdbm-dev libgdbm-dev libmysqlclient-dev
 
 phpMyAdmin wants --enable-mbstring
+icinga-web wants --with-xsl --enable-soap --with-xmlrpc 
+    and libxslt1-dev libltdl-dev packages
 
 --with-mysqli is for phpMyAdmin
 --with-mysql is for WordPress
@@ -53,7 +55,8 @@ phpMyAdmin wants --enable-mbstring
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
 --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
---enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring
+--enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring \
+--with-xsl --enable-soap --with-xmlrpc
 
 time make
 sudo make install
