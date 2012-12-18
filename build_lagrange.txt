@@ -70,13 +70,21 @@ mod_perl 2.0.7
 --------------
 Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.5.8.8.  If it doesn't exist, create it as a symlink back to the library file.
 
+For Linux:
 perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs 
+
+For OS X:
+perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs MP_CCOPTS=-std=gnu89
+
 time make
 time LD_LIBRARY_PATH=${PREFIX}/lib make test
 # if you are running a previous instance of mod_perl under stow, unstow that
 # instance prior to running make install, as mod_perl's make install is stupid
 # and will happily overwrite your existing mod_perl files
 sudo make install
+
+To install with a log of what got installed where:
+sudo make install 2>&1 | tee install.log
 
 Move /usr/local/lib/perl to /usr/local/stow/httpd-2.2.XX/lib
 Move /usr/local/man/man3 to /usr/local/stow/httpd-2.2.XX/man
