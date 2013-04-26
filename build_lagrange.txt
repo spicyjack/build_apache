@@ -4,14 +4,14 @@ it will install a stowable copy of itself
 export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
 export PREFIX_SUPPORT=/usr/lib
 
-OpenSSL 1.0.1c
+OpenSSL 1.0.1e
 --------------
 ./config --prefix=$PREFIX shared zlib
 time make
 time make test
 sudo make install
 
-Apache 2.2.23
+Apache 2.2.24
 ------------
 Wants libldap2-dev package if it's not already installed
 
@@ -33,7 +33,7 @@ Wants libldap2-dev package if it's not already installed
 time make
 sudo make install
 
-PHP 5.3.17
+PHP 5.3.24
 ---------
 Requirements: 
     libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
@@ -68,7 +68,9 @@ Install the following extensions for support of OpenPhoto
 
 mod_perl 2.0.7
 --------------
-Make sure 'libperl.so' exists, it should be a [sym|hard]link back to libperl.so.5.8.8.  If it doesn't exist, create it as a symlink back to the library file.
+Make sure 'libperl.so' exists, it should be a [sym|hard]link back to
+libperl.so.5.X.X.  If it doesn't exist, create it as a symlink back to the
+library file.
 
 For Linux:
 perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs 
@@ -110,4 +112,4 @@ their version numbers changed when you do a new install of Apache.
 
 Example equivs are stored in:
 
-ssh://purl443/srv/git/hostcfgs.git
+ssh://purl443/srv/git/hostcfgs.git/httpd/debian_equivs
