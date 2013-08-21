@@ -6,14 +6,16 @@ export PREFIX_SUPPORT=/usr/lib
 
 OpenSSL 1.0.1e
 --------------
+Wants: zlib1g-dev
+
 ./config --prefix=$PREFIX shared zlib
 time make
 time make test
 sudo make install
 
-Apache 2.2.24
+Apache 2.2.25
 ------------
-Wants libldap2-dev package if it's not already installed
+Wants: libldap2-dev
 
 ./configure --prefix=${PREFIX} --enable-modules=all \
 --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
