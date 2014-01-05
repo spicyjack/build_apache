@@ -1,5 +1,6 @@
 TODO: Install mod_perl on a VM and work with the configuration parameters so
 it will install a stowable copy of itself
+Note: OpenSSL was not compiled from scratch as of **04Jan2014**
 
 export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
 export PREFIX_SUPPORT=/usr/lib
@@ -13,7 +14,7 @@ time make
 time make test
 sudo make install
 
-Apache 2.2.25
+Apache 2.2.26
 ------------
 Wants: libldap2-dev libexpat1-dev
 
@@ -35,11 +36,11 @@ Wants: libldap2-dev libexpat1-dev
 time make
 sudo make install
 
-PHP 5.3.27
+PHP 5.4.23
 ---------
 Wants:  libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
         libqdbm-dev libgdbm-dev libmysqlclient-dev libjpeg8-dev
-        libpng12-dev libfreetype6-dev
+        libpng12-dev libfreetype6-dev libsasl2-dev
 
 phpMyAdmin wants --enable-mbstring
 icinga-web wants --with-xsl --enable-soap --with-xmlrpc 
@@ -48,13 +49,18 @@ icinga-web wants --with-xsl --enable-soap --with-xmlrpc
 --with-mysqli is for phpMyAdmin
 --with-mysql is for WordPress
 
+Debian Wheezy needs a symlink from the installed `libldap.so` to `/usr/lib`
+
+  sudo ln -fs /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2.8.3 /usr/lib/libldap.so
+
 ./configure --prefix=${PREFIX} \
 --with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
---with-config-file-scan-dir=/etc/httpd --with-openssl=${PREFIX} --with-zlib \
+--with-config-file-scan-dir=/etc/httpd --with-openssl --with-zlib \
 --with-bz2 --enable-calendar --enable-dba --with-gdbm --enable-exif \
 --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
---enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT --with-ldap \
+--enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT \
+--with-ldap --with-ldap-sasl \
 --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring \
