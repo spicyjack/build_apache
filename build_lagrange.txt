@@ -69,10 +69,13 @@ Debian Wheezy needs a symlink from the installed `libldap.so` to `/usr/lib`
 time make
 sudo make install
 
-Install the following extensions for support of OpenPhoto
+Phabricator extensions: 
+- sudo pecl install apc
+
+OpenPhoto extensions:
 - sudo apt-get install libmagick9-dev
-- sudo ./pecl install imagick
-- sudo ./pecl install apc
+- sudo pecl install imagick
+- sudo pecl install apc
 
 mod_perl 2.0.7
 --------------
