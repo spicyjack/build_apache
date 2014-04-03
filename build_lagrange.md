@@ -2,39 +2,40 @@ TODO: Install mod_perl on a VM and work with the configuration parameters so
 it will install a stowable copy of itself
 Note: OpenSSL was not compiled from scratch as of **04Jan2014**
 
-export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
-export PREFIX_SUPPORT=/usr/lib
+    export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
+    export PREFIX_SUPPORT=/usr/lib
 
 OpenSSL 1.0.1f
 --------------
 Wants: zlib1g-dev
 
-./config --prefix=$PREFIX shared zlib
-time make
-time make test
-sudo make install
+    ./config --prefix=$PREFIX shared zlib
+    time make
+    time make test
+    sudo make install
 
 Apache 2.2.27
 -------------
 Wants: libldap2-dev libexpat1-dev
 
-./configure --prefix=${PREFIX} --enable-modules=all \
---enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
---enable-authn-anon --enable-authn-dbd --enable-authn-alias --enable-authz-dbm \
---enable-authz-owner --enable-auth-digest --enable-file-cache --enable-cache \
---enable-disk-cache --enable-mem-cache --enable-dbd --enable-echo \
---enable-deflate --enable-mime-magic --enable-http --enable-dav --enable-info \
---enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
---enable-vhost-alias --enable-rewrite --enable-so --with-mpm=prefork \
---enable-proxy --enable-proxy-connect --enable-proxy-ftp --enable-proxy-http \
---enable-ssl --enable-static-htpasswd --with-ssl=${PREFIX} \
---enable-authnz-ldap --with-ldap=ldap --enable-ldap --with-included-apr \
---with-expat=/usr
+    ./configure --prefix=${PREFIX} --enable-modules=all \
+    --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
+    --enable-authn-anon --enable-authn-dbd --enable-authn-alias \
+    --enable-authz-dbm --enable-authz-owner --enable-auth-digest \
+    --enable-file-cache --enable-cache --enable-disk-cache \
+    --enable-mem-cache --enable-dbd --enable-echo --enable-deflate \
+    --enable-mime-magic --enable-http --enable-dav --enable-info \
+    --enable-speling --enable-cgi --enable-dav-fs --enable-dav-lock \
+    --enable-vhost-alias --enable-rewrite --enable-so --with-mpm=prefork \
+    --enable-proxy --enable-proxy-connect --enable-proxy-ftp \
+    --enable-proxy-http --enable-ssl --enable-static-htpasswd \
+    --with-ssl=${PREFIX} --enable-authnz-ldap --with-included-apr \
+    --with-ldap=ldap --enable-ldap --with-expat=/usr
+
+    time make
+    sudo make install
 
 --with-expat=/usr is apparently needed on 64-bit systems.
-
-time make
-sudo make install
 
 PHP 5.4.26
 ----------
@@ -44,36 +45,34 @@ Wants:  libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
 
 Other app dependencies are located below.
 
-Debian Wheezy needs a symlink from the installed `libldap.so` to `/usr/lib`
-
-  sudo ln -fs /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2.8.3 \
-    /usr/lib/libldap.so
-  sudo ln -fs /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2.8.3 \
-    /usr/lib/libldap_r-2.4.so.2.8.3
-
 Can't use the Apache copy of OpenSSL, because libcurl is not linked against
-it.  So '--with-openssl' can never be '--with-openssl=${PREFIX}'.
+it.  So `--with-openssl` can never be `--with-openssl=${PREFIX}`.
 
-Can't set a path to 'libldap', because the headers are in '/usr/include', but
-the libraries are in '/usr/lib/x86_64-linux-gnu'.
+Can't set a path to `libldap`, because the headers are in `/usr/include`, but
+the libraries are in `/usr/lib/x86_64-linux-gnu`.
 
-./configure --prefix=${PREFIX} \
---with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
---with-config-file-scan-dir=/etc/httpd --with-openssl \
---with-zlib --with-bz2 --enable-calendar --enable-dba=shared \
---with-gdbm=/usr/lib/x86_64-linux-gnu \
---enable-exif --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
---with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
---enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT \
---with-ldap=/usr/lib/x86_64-linux-gnu --with-ldap-sasl \
---with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
---enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
---enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring \
---enable-pcntl --with-libdir=lib/x86_64-linux-gnu
+    LDFLAGS="-L/usr/lib -L/usr/lib/x86_64-linux-gnu" \
+    CPPFLAGS="-I/usr/include" \
+    ./configure --prefix=${PREFIX} \
+    --with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
+    --with-config-file-scan-dir=/etc/httpd \
+    --with-openssl \
+    --with-zlib --with-bz2 --enable-calendar --enable-dba=shared \
+    --with-gdbm=/usr/lib/x86_64-linux-gnu --enable-ftp \
+    --enable-exif --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
+    --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
+    --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT \
+    --with-ldap \
+    --with-ldap-sasl \
+    --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+    --enable-sockets --enable-sysvsem --enable-sysvshm \
+    --with-curl=/usr/lib/x86_64-linux-gnu \
+    --enable-zip --with-pear --with-pdo-mysql --with-mcrypt \
+    --enable-mbstring --enable-pcntl --with-libdir=lib/x86_64-linux-gnu
 
-time make
-time make test
-sudo make install
+    time make
+    time make test
+    sudo make install
 
 PHP App configs
 ---------------
@@ -99,7 +98,7 @@ OpenPhoto
 
 mod_perl 2.0.7
 --------------
-Make sure 'libperl.so' exists, it should be a [sym|hard]link back to
+Make sure 'libperl.so' exists, it should be a symlink/hardlink back to
 libperl.so.5.X.X.  If it doesn't exist, create it as a symlink back to the
 library file.
 
@@ -141,3 +140,4 @@ Example equivs are stored in:
 
     hostcfgs.git/httpd/debian_equivs
 
+vim: filetype=markdown tabstop=2 shiftwidth=2
