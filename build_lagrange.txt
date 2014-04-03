@@ -5,7 +5,7 @@ Note: OpenSSL was not compiled from scratch as of **04Jan2014**
 export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
 export PREFIX_SUPPORT=/usr/lib
 
-OpenSSL 1.0.1e
+OpenSSL 1.0.1f
 --------------
 Wants: zlib1g-dev
 
@@ -14,8 +14,8 @@ time make
 time make test
 sudo make install
 
-Apache 2.2.26
-------------
+Apache 2.2.27
+-------------
 Wants: libldap2-dev libexpat1-dev
 
 ./configure --prefix=${PREFIX} --enable-modules=all \
@@ -36,46 +36,66 @@ Wants: libldap2-dev libexpat1-dev
 time make
 sudo make install
 
-PHP 5.4.23
----------
+PHP 5.4.26
+----------
 Wants:  libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
         libqdbm-dev libgdbm-dev libmysqlclient-dev libjpeg8-dev
         libpng12-dev libfreetype6-dev libsasl2-dev
 
-phpMyAdmin wants --enable-mbstring
-icinga-web wants --with-xsl --enable-soap --with-xmlrpc 
-    and libxslt1-dev libltdl-dev packages
-
---with-mysqli is for phpMyAdmin
---with-mysql is for WordPress
+Other app dependencies are located below.
 
 Debian Wheezy needs a symlink from the installed `libldap.so` to `/usr/lib`
 
-  sudo ln -fs /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2.8.3 /usr/lib/libldap.so
+  sudo ln -fs /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2.8.3 \
+    /usr/lib/libldap.so
+  sudo ln -fs /usr/lib/x86_64-linux-gnu/libldap_r-2.4.so.2.8.3 \
+    /usr/lib/libldap_r-2.4.so.2.8.3
+
+Can't use the Apache copy of OpenSSL, because libcurl is not linked against
+it.  So '--with-openssl' can never be '--with-openssl=${PREFIX}'.
+
+Can't set a path to 'libldap', because the headers are in '/usr/include', but
+the libraries are in '/usr/lib/x86_64-linux-gnu'.
 
 ./configure --prefix=${PREFIX} \
 --with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
---with-config-file-scan-dir=/etc/httpd --with-openssl --with-zlib \
---with-bz2 --enable-calendar --enable-dba --with-gdbm --enable-exif \
---enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
+--with-config-file-scan-dir=/etc/httpd --with-openssl \
+--with-zlib --with-bz2 --enable-calendar --enable-dba=shared \
+--with-gdbm=/usr/lib/x86_64-linux-gnu \
+--enable-exif --enable-ftp --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
 --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
 --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT \
---with-ldap --with-ldap-sasl \
+--with-ldap=/usr/lib/x86_64-linux-gnu --with-ldap-sasl \
 --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
 --enable-sockets --enable-sysvsem --enable-sysvshm --with-curl \
 --enable-zip --with-pear --with-pdo-mysql --with-mcrypt --enable-mbstring \
---with-xsl --enable-soap --with-xmlrpc
+--enable-pcntl --with-libdir=lib/x86_64-linux-gnu
 
 time make
+time make test
 sudo make install
 
-Phabricator extensions: 
-- sudo pecl install apc
+PHP App configs
+---------------
+phpMyAdmin
+- switches: --enable-mbstring --with-mysqli
 
-OpenPhoto extensions:
-- sudo apt-get install libmagick9-dev
-- sudo pecl install imagick
-- sudo pecl install apc
+icinga-web
+- switches: --with-xsl --enable-soap --with-xmlrpc 
+- packages: libxslt1-dev libltdl-dev packages
+
+WordPress
+- switches: --with-mysql
+
+Phabricator 
+- switches: --enable-pcntl
+- extensions: sudo pecl install apc
+
+OpenPhoto 
+- extensions:
+  - sudo apt-get install libmagick9-dev
+  - sudo pecl install imagick
+  - sudo pecl install apc
 
 mod_perl 2.0.7
 --------------
@@ -104,11 +124,7 @@ Move /usr/local/man/man3 to /usr/local/stow/httpd-2.2.XX/man
 
 Testing
 -------
-- phpinfo.php page
-  - https://shell.xaoc.org/phpMyAdmin/phpinfo.php - requires login first
-- http://purl.xaoc.org/perl-status
-- http://purl.xaoc.org/server-status
-- http://purl.xaoc.org/server-info
+See full list of test URLs in machine_upgrades.md
 
 Building fake Debian packages using 'equivs'
 --------------------------------------------
@@ -123,4 +139,5 @@ their version numbers changed when you do a new install of Apache.
 
 Example equivs are stored in:
 
-ssh://purl443/srv/git/hostcfgs.git/httpd/debian_equivs
+    hostcfgs.git/httpd/debian_equivs
+
