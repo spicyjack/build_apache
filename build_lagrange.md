@@ -56,17 +56,13 @@ the libraries are in `/usr/lib/x86_64-linux-gnu`.
     ./configure --prefix=${PREFIX} \
     --with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
     --with-config-file-scan-dir=/etc/httpd \
-    --with-openssl \
-    --with-zlib --with-bz2 --enable-calendar --enable-dba=shared \
-    --with-gdbm=/usr/lib/x86_64-linux-gnu --enable-ftp \
-    --enable-exif --with-gd --with-jpeg-dir=$PREFIX_SUPPORT \
-    --with-png-dir=$PREFIX_SUPPORT --with-freetype-dir=$PREFIX_SUPPORT \
-    --enable-gd-native-ttf --with-gettext=$PREFIX_SUPPORT \
-    --with-ldap \
-    --with-ldap-sasl \
+    --with-openssl --with-zlib --with-bz2 --enable-calendar \
+    --enable-dba=shared --with-gdbm --enable-ftp \
+    --enable-exif --with-gd --enable-gd-native-ttf \
+    --with-jpeg-dir=${PREFIX_SUPPORT} --with-freetype-dir=${PREFIX_SUPPORT} \
+    --with-gettext --with-ldap --with-ldap-sasl \
     --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
     --enable-sockets --enable-sysvsem --enable-sysvshm \
-    --with-curl=/usr/lib/x86_64-linux-gnu \
     --enable-zip --with-pear --with-pdo-mysql --with-mcrypt \
     --enable-mbstring --enable-pcntl --with-libdir=lib/x86_64-linux-gnu
 
@@ -95,6 +91,15 @@ OpenPhoto
   - sudo apt-get install libmagick9-dev
   - sudo pecl install imagick
   - sudo pecl install apc
+
+PHP Misc notes
+--------------
+You can verify the PHP build from the command line, without
+starting/restarting Apache by running:
+
+    ./sapi/cli/php -i
+
+from the PHP source directory.
 
 mod_perl 2.0.7
 --------------
