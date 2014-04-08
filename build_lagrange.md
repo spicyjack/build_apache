@@ -29,15 +29,17 @@ Wants: libldap2-dev libexpat1-dev
     --enable-vhost-alias --enable-rewrite --enable-so --with-mpm=prefork \
     --enable-proxy --enable-proxy-connect --enable-proxy-ftp \
     --enable-proxy-http --enable-ssl --enable-static-htpasswd \
-    --with-ssl=${PREFIX} --enable-authnz-ldap --with-included-apr \
+    --enable-authnz-ldap --with-included-apr \
     --with-ldap=ldap --enable-ldap --with-expat=/usr
 
     time make
     sudo make install
 
---with-expat=/usr is apparently needed on 64-bit systems.
+- `--with-expat=/usr` is apparently needed on 64-bit systems.
+- `--with-ssl=${PREFIX}` will use an OpenSSL library installed into
+  `${PREFIX}`
 
-PHP 5.4.26
+PHP 5.4.27
 ----------
 Wants:  libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
         libqdbm-dev libgdbm-dev libmysqlclient-dev libjpeg8-dev
@@ -63,7 +65,7 @@ the libraries are in `/usr/lib/x86_64-linux-gnu`.
     --with-gettext --with-ldap --with-ldap-sasl \
     --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
     --enable-sockets --enable-sysvsem --enable-sysvshm \
-    --enable-zip --with-pear --with-pdo-mysql --with-mcrypt \
+    --with-curl --enable-zip --with-pear --with-pdo-mysql --with-mcrypt \
     --enable-mbstring --enable-pcntl --with-libdir=lib/x86_64-linux-gnu
 
     time make
