@@ -5,20 +5,26 @@ Note: OpenSSL was not compiled from scratch as of **04Jan2014**
     export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
     export PREFIX_SUPPORT=/usr/lib
 
-OpenSSL 1.0.1f
+LibreSSL 2.6.2
 --------------
 Wants: zlib1g-dev
 
-    ./config --prefix=$PREFIX shared zlib
+    ./configure --prefix=$PREFIX
     time make
     time make test
     sudo make install
 
-Apache 2.2.27
+Apache 2.4.29
 -------------
 Wants: libldap2-dev libexpat1-dev
 
-    ./configure --prefix=${PREFIX} --enable-modules=all \
+Download Apache from http://httpd.apache.org/download.cgi.  Download APR and
+APR-Util packages from http://apr.apache.org/download.cgi.  Unpack APR and
+APR-Util into the `srclib/` directory in the Apache source tree.
+
+
+    ./configure --prefix=${PREFIX} --with-included-apr \
+    --enable-modules=all \
     --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
     --enable-authn-anon --enable-authn-dbd --enable-authn-alias \
     --enable-authz-dbm --enable-authz-owner --enable-auth-digest \
@@ -39,7 +45,7 @@ Wants: libldap2-dev libexpat1-dev
 - `--with-ssl=${PREFIX}` will use an OpenSSL library installed into
   `${PREFIX}`
 
-PHP 5.4.27
+PHP 7.1.11
 ----------
 Wants:  libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
         libqdbm-dev libgdbm-dev libmysqlclient-dev libjpeg8-dev
@@ -63,10 +69,11 @@ the libraries are in `/usr/lib/x86_64-linux-gnu`.
     --enable-exif --with-gd --enable-gd-native-ttf \
     --with-jpeg-dir=${PREFIX_SUPPORT} --with-freetype-dir=${PREFIX_SUPPORT} \
     --with-gettext --with-ldap --with-ldap-sasl \
-    --with-mysql --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+    --with-mcrypt --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
     --enable-sockets --enable-sysvsem --enable-sysvshm \
     --with-curl --enable-zip --with-pear --with-pdo-mysql --with-mcrypt \
-    --enable-mbstring --enable-pcntl --with-libdir=lib/x86_64-linux-gnu
+    --enable-mbstring --enable-pcntl --with-libdir=lib/x86_64-linux-gnu \
+    --with-pdo-pgsql --with-pgsql
 
     time make
     time make test
