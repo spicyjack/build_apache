@@ -2,28 +2,37 @@ TODO: Install mod_perl on a VM and work with the configuration parameters so
 it will install a stowable copy of itself
 Note: OpenSSL was not compiled from scratch as of **04Jan2014**
 
-    export PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
-    export PREFIX_SUPPORT=/usr/lib
+    export HTTP_PREFIX=/usr/local/stow/httpd-X.X.XX-YYYY.JJJ
+    export HTTP_PREFIX_SUPPORT=/usr/lib
 
 LibreSSL 2.6.2
 --------------
 Wants: zlib1g-dev
 
-    ./configure --prefix=$PREFIX
+    ./configure --prefix=$HTTP_PREFIX
     time make
-    time make test
     sudo make install
 
 Apache 2.4.29
 -------------
 Wants: libldap2-dev libexpat1-dev
 
-Download Apache from http://httpd.apache.org/download.cgi.  Download APR and
-APR-Util packages from http://apr.apache.org/download.cgi.  Unpack APR and
-APR-Util into the `srclib/` directory in the Apache source tree.
+- Download Apache from http://httpd.apache.org/download.cgi
+- Download APR and APR-Util packages from http://apr.apache.org/download.cgi
+- Unpack APR and APR-Util into the `srclib/` directory in the Apache source
+  tree
+- Symlink `apr-<version>` to `apr`, and `apr-util-<version>` to `apr-util`
 
 
-    ./configure --prefix=${PREFIX} --with-included-apr \
+    cd http-<version>/srclib
+    tar -jxvf apr-<version>.tar.bz2
+    ln -s apr-<version> apr
+    tar -jxvf apr-util-<version>.tar.bz2
+    ln -s apr-util-<version> apr
+
+Run `configure` in order to prepare the Apache source tree for building
+
+    ./configure --prefix=${HTTP_PREFIX} --with-included-apr \
     --enable-modules=all \
     --enable-mods-shared=all --enable-v4-mapped --enable-authn-dbm \
     --enable-authn-anon --enable-authn-dbd --enable-authn-alias \
@@ -42,38 +51,41 @@ APR-Util into the `srclib/` directory in the Apache source tree.
     sudo make install
 
 - `--with-expat=/usr` is apparently needed on 64-bit systems.
-- `--with-ssl=${PREFIX}` will use an OpenSSL library installed into
-  `${PREFIX}`
+- `--with-ssl=${HTTP_PREFIX}` will use an OpenSSL library installed into
+  `${HTTP_PREFIX}`
 
 PHP 7.1.11
 ----------
-Wants:  libxml2-dev mcrypt libmcrypt-dev libbz2-dev libcurl4-openssl-dev
-        libqdbm-dev libgdbm-dev libmysqlclient-dev libjpeg8-dev
-        libpng12-dev libfreetype6-dev libsasl2-dev
+Wants:  libxml2-dev libmcrypt-dev libbz2-dev libcurl4-openssl-dev
+        libqdbm-dev libgdbm-dev libmysqlclient-dev libjpeg62-turbo-dev
+        libpng12-dev libfreetype6-dev libsasl2-dev libzip-dev
 
 Other app dependencies are located below.
 
 Can't use the Apache copy of OpenSSL, because libcurl is not linked against
-it.  So `--with-openssl` can never be `--with-openssl=${PREFIX}`.
+it.  So `--with-openssl` can never be `--with-openssl=${HTTP_PREFIX}`.
 
 Can't set a path to `libldap`, because the headers are in `/usr/include`, but
 the libraries are in `/usr/lib/x86_64-linux-gnu`.
 
     LDFLAGS="-L/usr/lib -L/usr/lib/x86_64-linux-gnu" \
     CPPFLAGS="-I/usr/include" \
-    ./configure --prefix=${PREFIX} \
-    --with-apxs2=${PREFIX}/bin/apxs --with-config-file-path=/etc/httpd \
+    ./configure --prefix=${HTTP_PREFIX} \
+    --with-apxs2=${HTTP_PREFIX}/bin/apxs \
+    --with-config-file-path=/etc/httpd \
     --with-config-file-scan-dir=/etc/httpd \
     --with-openssl --with-zlib --with-bz2 --enable-calendar \
     --enable-dba=shared --with-gdbm --enable-ftp \
-    --enable-exif --with-gd --enable-gd-native-ttf \
-    --with-jpeg-dir=${PREFIX_SUPPORT} --with-freetype-dir=${PREFIX_SUPPORT} \
+    --enable-gd --with-jpeg --enable-exif \
+    --with-freetype \
     --with-gettext --with-ldap --with-ldap-sasl \
-    --with-mcrypt --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
+    --with-mysqli --with-mysql-sock=/var/run/mysqld/mysqld.sock \
     --enable-sockets --enable-sysvsem --enable-sysvshm \
-    --with-curl --enable-zip --with-pear --with-pdo-mysql --with-mcrypt \
-    --enable-mbstring --enable-pcntl --with-libdir=lib/x86_64-linux-gnu \
-    --with-pdo-pgsql --with-pgsql
+    --with-curl --with-zip --with-pear --with-pdo-mysql \
+    --enable-mbstring --enable-pcntl \
+    --with-pdo-pgsql --with-pgsql \
+    --with-libdir=lib/x86_64-linux-gnu
+
 
     time make
     time make test
@@ -117,13 +129,13 @@ libperl.so.5.X.X.  If it doesn't exist, create it as a symlink back to the
 library file.
 
 For Linux:
-perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs 
+perl Makefile.PL MP_APXS=${HTTP_PREFIX}/bin/apxs 
 
 For OS X:
-perl Makefile.PL MP_APXS=${PREFIX}/bin/apxs MP_CCOPTS=-std=gnu89
+perl Makefile.PL MP_APXS=${HTTP_PREFIX}/bin/apxs MP_CCOPTS=-std=gnu89
 
 time make
-time LD_LIBRARY_PATH=${PREFIX}/lib make test
+time LD_LIBRARY_PATH=${HTTP_PREFIX}/lib make test
 # if you are running a previous instance of mod_perl under stow, unstow that
 # instance prior to running make install, as mod_perl's make install is stupid
 # and will happily overwrite your existing mod_perl files
